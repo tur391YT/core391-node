@@ -1,0 +1,317 @@
+/* ==========================================================================
+   CORE 391 — СТИЛИ ПРОФИЛЯ ПОЛЬЗОВАТЕЛЯ
+   ========================================================================== */
+
+/* 1. БАЗОВАЯ ПЛАНИРОВКА */
+.profile-layout {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 2. ШАПКА: БАННЕР И АВАТАР */
+.profile-header-card {
+    min-height: 350px !important;
+    background-color: #0a0a0a;
+    border-radius: 15px;
+    overflow: hidden;
+    border: 1px solid #1a1a1a;
+    margin-bottom: 25px;
+    contain: layout;
+}
+
+.profile-banner {
+    height: 240px !important;
+    background-size: cover;
+    background-position: center var(--banner-y, 50%); 
+    background-color: #111 !important;
+    aspect-ratio: 1100 / 240; 
+    border-bottom: 1px solid #1a1a1a;
+    transition: background-position 0.2s ease-out;
+}
+
+.header-info-row {
+    display: flex;
+    padding: 0 30px 25px;
+    align-items: flex-end;
+    margin-top: -60px;
+    height: auto !important;
+}
+
+.avatar-stack {
+    position: relative;
+    z-index: 5;
+    transform: translate(var(--av-x, 0px), var(--av-y, 0px));
+    transition: transform 0.2s ease-out;
+}
+
+.profile-avatar {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 6px solid #0d0d0d;
+    background: #111;
+    object-fit: cover;
+}
+
+.user-level-badge {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: var(--accent-color, #ff4d00);
+    color: #000;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 900;
+    border: 2px solid #0d0d0d;
+}
+
+/* БЛОК ТЕКСТА (НИК + СТАТУС) */
+.user-info-text {
+    margin-left: 20px;
+    flex: 1;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    height: auto !important;
+    min-height: 100px !important;
+    padding-bottom: 10px;
+}
+
+.name-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.name-row h2 { 
+    font-size: 32px; 
+    text-transform: uppercase; 
+    font-weight: 900;
+    margin: 0;
+    color: #fff;
+}
+
+.gender-icon { color: var(--accent-color, #ff4d00); font-size: 20px; }
+
+.status-under-name {
+    margin-top: 5px !important;
+    font-size: 14px !important;
+    line-height: 1.3 !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+    white-space: normal !important; 
+    word-wrap: break-word !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 500px !important;
+}
+
+/* 3. СЕТКА КОНТЕНТА — ИСПРАВЛЕНИЕ РАСТЯГИВАНИЯ */
+.profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+    align-items: start; /* Не дает боковой панели растягиваться вслед за контентом */
+}
+
+.main-side {
+    min-height: 500px; /* Чтобы страница не "прыгала" при загрузке пустых вкладок */
+    display: flex;
+    flex-direction: column;
+}
+
+/* 4. ВНУТРЕННЯЯ НАВИГАЦИЯ */
+.inner-nav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.nav-btn {
+    background: #111;
+    border: 1px solid #222;
+    color: #888;
+    padding: 10px 22px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 14px;
+}
+
+.nav-btn.active, .nav-btn:hover {
+    background: var(--accent-color, #ff4d00);
+    color: #000;
+    border-color: var(--accent-color, #ff4d00);
+    font-weight: bold;
+}
+
+/* 5. БЛОКИ КОНТЕНТА */
+.tab-content { 
+    display: none; 
+    width: 100%;
+}
+
+.tab-content.active { 
+    display: block !important; 
+    animation: fadeInTab 0.4s ease-out;
+}
+
+@keyframes fadeInTab {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.content-block, .side-block {
+    background: #0d0d0d;
+    border: 1px solid #1a1a1a;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 20px;
+}
+
+.block-title { 
+    margin-bottom: 20px; 
+    color: var(--accent-color, #ff4d00); 
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* 6. АКТИВНОСТЬ И СТАТИСТИКА */
+.activity-item {
+    border-left: 3px solid var(--accent-color, #ff4d00);
+    padding: 12px 15px;
+    background: rgba(255, 77, 0, 0.03);
+    margin-bottom: 12px;
+    border-radius: 0 8px 8px 0;
+}
+
+/* Общий контейнер списка (убираем маркеры и добавляем отступы) */
+.user-details {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* ДОБАВЛЕНО: Гарантирует идеальное центрирование строк внутри контейнера */
+    gap: 12px;           /* Расстояние между строками */
+}
+
+/* Красивая сбалансированная строка информации */
+.user-details li {
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between; /* Разносит текст и дату по краям */
+    align-items: center;           /* Выравнивает строго по одной горизонтальной линии */
+    padding-bottom: 8px;
+    border-bottom: 1px solid #1a1a1a; /* Тонкая, едва заметная стильная линия */
+    width: 100%;
+    max-width: 260px;              /* Ограничиваем ширину, чтобы текст не улетал в бесконечность */
+    margin: 0 auto;                /* Центрируем весь блок внутри правой колонки */
+}
+
+/* Левая текстовая метка */
+.user-details li span {
+    color: #888;                   /* Приглушенный серый, чтобы дата выделялась */
+    font-weight: 500;
+}
+
+/* Правое значение (Дата / Счетчики) */
+.user-details li strong,
+.user-details li font {
+    color: #fff;                   /* Яркий белый цвет для значений */
+    font-weight: 700;              /* ИСПРАВЛЕНО: Объединено в один стандарт плотности (без конфликтов) */
+    letter-spacing: 0.5px;
+}
+
+/* 7. ФОРМЫ (НАСТРОЙКИ) */
+.settings-form { display: flex; flex-direction: column; gap: 20px; }
+
+.form-group label { 
+    display: block; 
+    font-size: 11px; 
+    color: #555; 
+    margin-bottom: 8px; 
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.form-group input, 
+.form-group select {
+    width: 100%;
+    background: #050505;
+    border: 1px solid #222;
+    padding: 12px;
+    color: #fff;
+    border-radius: 6px;
+    outline: none;
+    box-sizing: border-box; /* Чтобы padding не раздувал ширину инпута */
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus { 
+    border-color: var(--accent-color, #ff4d00); 
+}
+
+/* Многострочное поле для ввода длинного статуса */
+.status-textarea {
+    width: 100%;
+    min-height: 80px;       /* Начальная высота поля */
+    max-height: 200px;      /* Ограничение, чтобы форма не улетела вниз */
+    background: #050505;
+    border: 1px solid #222;
+    padding: 12px;
+    color: #fff;
+    border-radius: 6px;
+    outline: none;
+    box-sizing: border-box;
+    resize: vertical;       /* Разрешаем пользователю растягивать поле только по вертикали */
+    font-family: inherit;   /* Чтобы шрифт был как у остального сайта */
+    font-size: 14px;
+    line-height: 1.4;
+    transition: border-color 0.2s;
+}
+
+.status-textarea:focus {
+    border-color: var(--accent-color, #ff4d00);
+}
+
+/* Стилизация ползунков (range) для корректного отображения */
+.form-group input[type="range"] {
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-look {
+    background: var(--accent-color, #ff4d00);
+    color: #000;
+    border: none;
+    padding: 14px;
+    border-radius: 6px;
+    font-weight: 900;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: 0.2s;
+}
+
+.btn-look:hover {
+    filter: brightness(1.1);
+}
+
+.logout-btn-simple {
+    display: block;
+    text-align: center;
+    color: #444;
+    text-decoration: none;
+    font-size: 12px;
+    margin-top: 20px;
+    transition: color 0.3s;
+}
+
+.logout-btn-simple:hover { color: #ff4d00; }

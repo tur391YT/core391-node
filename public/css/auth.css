@@ -1,0 +1,69 @@
+/* Общие стили для страниц авторизации и регистрации */
+.auth-container { 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    height: 100vh; 
+    background: #050505; 
+}
+
+.auth-box { 
+    background: #0a0a0a; 
+    padding: 40px; 
+    border-radius: 15px; 
+    border: 1px solid #333; 
+    width: 350px; 
+    text-align: center; 
+    box-sizing: border-box; 
+}
+
+.auth-box h2 { 
+    color: #ff5500; 
+    margin-bottom: 20px; 
+    text-transform: uppercase; 
+    letter-spacing: 2px; 
+}
+
+/* Поля ввода */
+.auth-input { 
+    width: 100%; 
+    padding: 12px; 
+    margin-bottom: 15px; 
+    background: #111; 
+    border: 1px solid #222; 
+    color: #fff; 
+    border-radius: 5px; 
+    box-sizing: border-box; 
+}
+
+/* Кнопка отправки */
+.auth-btn { 
+    width: 100%; 
+    padding: 12px; 
+    background: #ff5500; 
+    border: none; 
+    color: #fff; 
+    font-weight: bold; 
+    cursor: pointer; 
+    border-radius: 5px; 
+    box-sizing: border-box; 
+    text-transform: uppercase;
+}
+
+/* Ссылка под формой */
+.auth-link { 
+    color: #888; 
+    display: block; 
+    margin-top: 15px; 
+    text-decoration: none; 
+    font-size: 14px; 
+}
+
+/* Фикс жёлтого фона автозаполнения в Chrome/Edge/Opera */
+.auth-input:-webkit-autofill,
+.auth-input:-webkit-autofill:hover, 
+.auth-input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #fff !important; 
+    -webkit-box-shadow: 0 0 0px 1000px #111 inset !important; 
+    transition: background-color 5000s ease-in-out 0s;
+}

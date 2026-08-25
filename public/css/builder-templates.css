@@ -1,0 +1,243 @@
+/* ==========================================================================
+   CORE 391 — ШАБЛОНЫ КОНТЕНТА (WOTPACK STYLE)
+   ========================================================================== */
+
+.wp-builder-section {
+    margin-bottom: 35px;
+    width: 100%;
+}
+
+/* Стилизация оранжевой полосы слева (Заголовки) */
+.wp-section-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    padding-left: 12px;
+    border-left: 4px solid var(--accent-color, #ff4d00);
+}
+
+/* Базовые таблицы */
+.wp-table-weapon, 
+.wp-table-team {
+    width: 100%;
+    border-collapse: collapse;
+    background: #0a0a0a;
+    border: 1px solid #1a1a1a;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.wp-table-weapon th, 
+.wp-table-team th {
+    background: #0d0d0d;
+    padding: 12px 15px;
+    font-size: 11px;
+    color: var(--accent-color, #ff4d00);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+    border-bottom: 1px solid #1a1a1a;
+}
+
+.wp-table-weapon td, 
+.wp-table-team td {
+    padding: 20px;
+    border: 1px solid #1a1a1a;
+    vertical-align: top;
+    background: #0d0d0d;
+}
+
+/* Центрированные ячейки карточек предметов */
+.wp-cell-center {
+    text-align: center;
+    background: #090909 !important;
+    width: 220px;
+}
+
+.wp-cell-effect {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #ccc;
+    text-align: left;
+}
+
+.wp-cell-effect strong {
+    color: var(--accent-color, #ff4d00);
+}
+
+/* Заглушки под иконки (квадратные и круглые) */
+.wp-item-blank-icon {
+    width: 70px;
+    height: 70px;
+    background: #161616;
+    border: 1px solid #252525;
+    border-radius: 8px;
+    margin: 0 auto 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wp-item-blank-icon.circle {
+    border-radius: 50%;
+}
+
+/* Тексты предметов */
+.wp-item-name {
+    font-size: 15px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 4px;
+}
+
+.wp-stars {
+    color: #ffb400;
+    font-size: 12px;
+    margin-bottom: 6px;
+    letter-spacing: 2px;
+}
+
+.wp-item-sub {
+    font-size: 11px;
+    color: #666;
+}
+
+/* СЕТКА ДЛЯ ЭХО */
+.wp-grid-echo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: #1a1a1a;
+    border: 1px solid #1a1a1a;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.wp-echo-card-left, 
+.wp-echo-card-right {
+    background: #0d0d0d;
+    padding: 15px 20px;
+}
+
+.wp-block-header-text {
+    font-size: 11px;
+    color: var(--accent-color, #ff4d00);
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.wp-echo-meta {
+    text-align: center;
+    padding-bottom: 10px;
+}
+
+.wp-set-desc {
+    font-size: 13px;
+    color: #999;
+    line-height: 1.5;
+    margin-top: 8px;
+}
+
+/* Пулл Эхо (внутренняя плашка) */
+.wp-echo-pool {
+    background: #090909;
+    border: 1px solid #161616;
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.wp-echo-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.wp-echo-item .wp-item-blank-icon {
+    margin: 0;
+    width: 55px;
+    height: 55px;
+}
+
+.wp-echo-stats {
+    font-size: 12px;
+    color: #666;
+}
+
+.wp-echo-stats-list {
+    margin: 0;
+    padding-left: 20px;
+    color: #ccc;
+    font-size: 13px;
+}
+
+.wp-echo-stats-list li {
+    margin-bottom: 6px;
+}
+
+/* СЕТКА ДЛЯ ОТРЯДОВ */
+.wp-team-slots {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 10px;
+}
+
+.wp-slot {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.wp-slot-role {
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 900;
+    margin-bottom: 8px;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Цвета ролей как в гайдах */
+.wp-slot-role.main-dd { color: #ff4d00; background: rgba(255, 77, 0, 0.1); }
+.wp-slot-role.sub-dd { color: #ff9f00; background: rgba(255, 159, 0, 0.1); }
+.wp-slot-role.support { color: #00ffaa; background: rgba(0, 255, 170, 0.1); }
+
+.wp-slot-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    margin-top: 4px;
+}
+
+/* АДАПТИВНОСТЬ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ */
+@media (max-width: 768px) {
+    .wp-grid-echo {
+        grid-template-columns: 1fr;
+    }
+    
+    .wp-team-slots {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .wp-cell-center {
+        width: 100%;
+    }
+
+    .wp-table-weapon td, 
+    .wp-table-team td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+}

@@ -1,0 +1,233 @@
+/* 1. ВСЕ импорты */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+@import url('header-new.css');
+@import url('footer.css');
+
+/* --- СИСТЕМА ТЕМАТИЗАЦИИ --- */
+:root {
+    --accent-color: #ff4d00;
+    --hover-glow: rgba(255, 77, 0, 0.3);
+}
+
+/* Поддержка игровых тем */
+body.wuwa { --accent-color: #a333ff; --hover-glow: rgba(163, 51, 255, 0.4); }
+body.zzz { --accent-color: #00beee; --hover-glow: rgba(0, 190, 238, 0.3); }
+body.star-rail { --accent-color: #8aff67; --hover-glow: rgba(138, 255, 103, 0.3); }
+body.genshin { --accent-color: #f02424; --hover-glow: rgba(207, 0, 0, 0.452); }
+body.default { --accent-color: #ff4d00; --hover-glow: rgba(255, 77, 0, 0.3); }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #050505;
+    color: #ffffff;
+    margin: 0;
+    line-height: 1.6;
+    overflow-x: hidden; /* Защита от горизонтальной прокрутки */
+}
+
+.game-title, .section-title, .category-badge {
+    color: var(--accent-color) !important;
+    transition: color 0.3s ease;
+}
+
+/* --- ГЕРОЙ-БАННЕР --- */
+.hero {
+    background-size: cover;
+    background-position: center center; 
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background-color: #0a0a0a; /* Цвет-заглушка */
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);
+    z-index: 1;
+}
+
+.hero-content h1 {
+    font-size: 56px;
+    font-weight: 900;
+    text-transform: uppercase;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.1;
+    z-index: 2;
+    position: relative;
+    color: var(--accent-color) !important;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.hero-content h1 span {
+    color: #ffffff !important;
+    opacity: 1 !important;
+    letter-spacing: normal !important;
+    font-size: inherit !important;
+    display: inline-block !important;
+}
+
+/* Метка РАЗДЕЛ над заголовком */
+span.section-label {
+    display: block !important;
+    font-size: 14px !important;
+    letter-spacing: 5px !important;
+    opacity: 0.6 !important;
+    font-weight: 400 !important;
+    margin-bottom: 5px !important;
+    order: -1;
+    color: #fff !important;
+}
+
+/* --- СЛАЙДЕР --- */
+.slider-container { 
+    position: relative; 
+    overflow: hidden; 
+    border-radius: 15px; 
+    margin-bottom: 40px; 
+    height: 450px; 
+    background: #0d0d0d; 
+}
+
+.top-slider { 
+    display: flex; 
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); 
+    height: 100%; 
+}
+
+.slide-item { 
+    flex: 0 0 100%; 
+    position: relative; 
+    text-decoration: none; 
+    color: #fff !important; 
+}
+
+.slide-item img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+}
+
+.slide-info { 
+    position: absolute; 
+    bottom: 0; 
+    left: 0; 
+    right: 0; 
+    padding: 40px; 
+    background: linear-gradient(transparent, rgba(0,0,0,0.95)); 
+}
+
+/* --- СЕТКА И КАРТОЧКИ --- */
+.main-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.index-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important; 
+    gap: 30px !important;
+    align-items: stretch;
+}
+
+.game-card {
+    background: #0d0d0d !important;
+    border: 1px solid #1a1a1a !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    text-align: center !important;
+    transition: all 0.3s ease !important;
+    text-decoration: none !important;
+    height: 100% !important;
+    position: relative;
+}
+
+.game-card:hover {
+    transform: translateY(-8px) !important;
+    border-color: var(--accent-color) !important;
+    box-shadow: 0 10px 30px var(--hover-glow) !important;
+}
+
+.game-card img { 
+    width: 100%; 
+    height: 200px; 
+    object-fit: cover; 
+    display: block; 
+    background: #111;
+}
+
+.game-card .content {
+    padding: 20px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    flex-grow: 1 !important;
+}
+
+.game-card h3 { 
+    color: #ffffff !important; 
+    margin: 10px 0 !important; 
+    font-size: 18px !important; 
+    font-weight: 700; 
+}
+
+/* Кнопка подгоняется в самый низ */
+.game-card .btn-look {
+    margin-top: auto !important;
+}
+
+.btn-look {
+    display: inline-block !important;
+    padding: 10px 30px !important;
+    background: transparent !important;
+    border: 2px solid var(--accent-color) !important;
+    color: var(--accent-color) !important;
+    border-radius: 6px !important;
+    font-size: 12px !important;
+    font-weight: 900 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    transition: 0.3s !important;
+}
+
+.btn-look:hover {
+    background: var(--accent-color) !important;
+    color: #ffffff !important;
+}
+
+/* --- НАСТРОЙКА ФОНОВ --- */
+body.default .hero { background-image: url('../img/banner.png'); background-position: center 10%; }
+body.genshin .hero { background-image: url('../img/banners/genshin_bg.jpg'); background-position: center 20%; }
+body.star-rail .hero { background-image: url('../img/banners/hsr_bg.jpg'); background-position: center 50%; }
+body.zzz .hero { background-image: url('../img/banners/zzz_bg.jpg'); background-position: center 40%; }
+body.wuwa .hero { background-image: url('../img/banners/wuwa_bg.jpg'); background-position: center 50%; }
+
+/* АДАПТИВНОСТЬ */
+@media (max-width: 768px) {
+    .hero {
+        height: 280px;
+    }
+    
+    .hero-content h1 {
+        font-size: 32px;
+    }
+
+    .slider-container {
+        height: 280px;
+    }
+
+    .slide-info {
+        padding: 20px;
+    }
+
+    .index-grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+    }
+}

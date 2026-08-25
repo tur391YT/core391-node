@@ -1,0 +1,308 @@
+/* ==========================================================================
+   --- СТИЛИ ДЛЯ АДАПТИВНЫХ БЛОКОВ CORE 391 (СТАБИЛЬНАЯ СБОРКА V3) ---
+   ========================================================================== */
+
+/* Глобальный сброс box-sizing внутри контента и редактора */
+.entry-content,
+.entry-content *,
+.entry-content *::before,
+.entry-content *::after,
+#visual-editor,
+#visual-editor * {
+    box-sizing: border-box !important;
+}
+
+/* Базовые стили для контента на сайте и в редакторе */
+.entry-content,
+#visual-editor { 
+    color: #ccc; 
+    line-height: 1.8; 
+    font-size: 1.1rem; 
+    background: #070707;
+}
+
+.post-container-wide a:hover { 
+    border-color: #ff4d00 !important; 
+    color: #fff !important; 
+}
+.main-content.theme-wuwa a:hover { 
+    border-color: #ffcc00 !important; 
+}
+
+/* ==========================================================================
+   ЗАГОЛОВКИ СЕКЦИЙ (Вертикальная неоновая линия)
+   ========================================================================== */
+.wp-section-title {
+    border-left: 4px solid #ff4d00 !important;
+    padding-left: 12px !important;
+    margin: 35px 0 20px !important;
+    color: #fff !important;
+    text-transform: uppercase;
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+.main-content.theme-wuwa .wp-section-title { 
+    border-left-color: #ffcc00 !important; 
+}
+
+/* ==========================================================================
+   БЛОКИ ПЛЮСОВ И МИНУСОВ
+   ========================================================================== */
+.wp-pros-cons-container {
+    display: flex !important;
+    gap: 20px !important;
+    margin: 20px 0 !important;
+}
+@media (max-width: 768px) {
+    .wp-pros-cons-container { flex-direction: column !important; }
+}
+.pros-box, .cons-box {
+    flex: 1 !important;
+    padding: 20px !important;
+    border-radius: 8px !important;
+    background: #090909 !important;
+}
+.pros-box { border: 1px solid #1b4322 !important; border-left: 4px solid #4caf50 !important; }
+.cons-box { border: 1px solid #4a1d1d !important; border-left: 4px solid #f44336 !important; }
+.pros-box b { color: #4caf50; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
+.cons-box b { color: #f44336; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
+
+/* ==========================================================================
+   ТАБЛИЦЫ (Оружие / Материалы / Отряды)
+   ========================================================================== */
+.wp-table-wrapper {
+    margin: 20px 0;
+    border: 1px solid #161616;
+    border-radius: 8px;
+    overflow-x: auto;
+    background: #070707;
+    width: 100%;
+}
+.wp-table-weapon, .wp-table-team {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    table-layout: fixed;
+}
+.wp-table-weapon th, .wp-table-team th {
+    background: #0f0f0f !important;
+    padding: 14px 20px !important;
+    color: #ff4d00 !important;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #161616 !important;
+    text-align: left !important;
+}
+.main-content.theme-wuwa .wp-table-weapon th, 
+.main-content.theme-wuwa .wp-table-team th { 
+    color: #ffcc00 !important; 
+}
+.wp-table-weapon td, .wp-table-team td {
+    border-bottom: 1px solid #111 !important;
+    padding: 15px !important;
+}
+
+/* Левая ячейка оружия с аватаром */
+.wp-cell-center {
+    text-align: center !important;
+    padding: 20px 15px !important;
+    vertical-align: middle !important;
+    border-right: 1px solid #161616 !important;
+    background: #090909 !important;
+    width: 30%;
+}
+@media (max-width: 600px) {
+    .wp-cell-center { width: 40%; }
+}
+
+.wp-cell-effect {
+    padding: 20px !important;
+    vertical-align: top !important;
+    color: #bbb;
+    font-size: 0.95rem;
+}
+.wp-cell-effect p { margin: 0 0 10px 0; }
+.wp-cell-effect p:last-child { margin-bottom: 0; }
+
+/* ==========================================================================
+   КАРТОЧКИ АРТЕФАКТОВ / ЭХО
+   ========================================================================== */
+.wp-artifacts-container { 
+    margin: 20px 0; 
+    width: 100%; 
+    background: #070707;
+}
+.wp-artifacts-list-wrapper { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 20px; 
+}
+.wp-grid-echo {
+    display: flex;
+    gap: 20px;
+}
+.wp-echo-card-left, .wp-echo-card-right {
+    flex: 1;
+    background: #070707;
+    border: 1px solid #161616;
+    border-radius: 8px;
+    padding: 22px;
+}
+@media (max-width: 768px) {
+    .wp-grid-echo { flex-direction: column; }
+    .wp-echo-card-left, .wp-echo-card-right { flex: none; width: 100%; }
+}
+.wp-block-header-text {
+    color: #ff4d00;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid #161616;
+    padding-bottom: 8px;
+}
+.main-content.theme-wuwa .wp-block-header-text { color: #ffcc00; }
+
+.wp-echo-recommend-title {
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+}
+.wp-echo-recommend-text { color: #bbb; font-size: 0.9rem; line-height: 1.6; }
+
+/* ==========================================================================
+   КАРТОЧКИ ОТРЯДА (СТРОГАЯ СЕТКА И РОЛИ)
+   ========================================================================== */
+.wp-team-slots {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 12px !important;
+    padding: 12px !important;
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+    flex-wrap: nowrap !important;
+    background: #090909 !important;
+    width: 100% !important;
+}
+
+.wp-slot {
+    background: #050505 !important;
+    border: 1px solid #1a1a1a !important;
+    border-radius: 6px !important;
+    padding: 10px 6px !important;
+    text-align: center !important;
+    width: 95px !important;
+    min-width: 95px !important;   
+    max-width: 95px !important;   
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+/* Плашки Ролей */
+.wp-slot-role {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 24px !important;
+    font-size: 9px !important;
+    text-transform: uppercase !important;
+    padding: 2px 4px !important;
+    border-radius: 4px !important;
+    margin-bottom: 12px !important;
+    font-weight: 700 !important;
+    color: #ffffff !important; 
+    line-height: 1.1 !important;
+}
+
+.wp-slot-role.main-dd { background: #8a2500 !important; border: 1px solid #ff4d00 !important; }
+.main-content.theme-wuwa .wp-slot-role.main-dd { background: #947100 !important; border: 1px solid #ffcc00 !important; }
+.wp-slot-role.sub-dd { background: #5c1866 !important; border: 1px solid #a626b7 !important; }
+.wp-slot-role.support { background: #1b4d22 !important; border: 1px solid #2e7d32 !important; }
+.wp-slot-role.heal, .wp-slot-role[class*="heal"] { background: #20717a !important; border: 1px solid #2da6b5 !important; }
+
+.wp-slot-name {
+    display: block !important;
+    width: 100% !important;
+    font-size: 11px !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    margin-top: 8px !important;
+    text-align: center !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+@media (max-width: 768px) {
+    .wp-team-slots { flex-wrap: wrap !important; }
+}
+
+/* ==========================================================================
+   ИКОНКИ И АВАТАРЫ (ФИКСИРОВАННЫЕ РАЗМЕРЫ)
+   ========================================================================== */
+.wp-avatar-img,
+.wp-item-blank-icon {
+    width: 65px !important;
+    height: 65px !important;
+    min-width: 65px !important;
+    min-height: 65px !important;
+    max-width: 65px !important;
+    max-height: 65px !important;
+    display: block !important;
+    margin: 0 auto !important;
+    border-radius: 6px !important;
+    border: 1px solid #222 !important;
+    background: #121212;
+    object-fit: cover !important;
+}
+
+.wp-table-weapon .wp-avatar-img {
+    width: 70px !important;
+    height: 70px !important;
+    min-width: 70px !important;
+    min-height: 70px !important;
+    max-width: 70px !important;
+    max-height: 70px !important;
+}
+
+.wp-item-name { font-weight: 700; color: #fff; margin-top: 6px; margin-bottom: 4px; font-size: 1rem; }
+.wp-stars { color: #ffcc00; font-size: 0.8rem; margin-bottom: 4px; letter-spacing: 1px; }
+.wp-item-sub { color: #666; font-size: 0.75rem; line-height: 1.3; }
+
+/* ==========================================================================
+   ФИКС ОПУБЛИКОВАННЫХ И ПРОСТО КАРТИНОК В СТАТЬЕ
+   ========================================================================== */
+
+/* Игнорируем встроенные width="" в HTML для обычных картинок */
+.entry-content img:not(.wp-avatar-img):not(.wp-item-blank-icon),
+#visual-editor img:not(.wp-avatar-img):not(.wp-item-blank-icon) { 
+    width: auto !important;
+    min-width: 300px !important; /* Гарантирует, что картинка не будет спичечной коробкой */
+    max-width: 100% !important;
+    height: auto !important;
+    border-radius: 10px !important; 
+    margin: 20px auto !important; 
+    display: block !important; 
+}
+/* Если картинка не загрузилась или путь битый */
+#visual-editor img:invalid,
+#visual-editor img:-moz-broken,
+#visual-editor img:not([src]),
+#visual-editor img[src=""],
+#visual-editor img[src*="placeholder"] {
+    background: #1a1a1a url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23ff7700" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>') center no-repeat !important;
+    border: 1px dashed #ff7700 !important;
+}
+
+/* Рамка при наведении, чтобы точно не промахнуться */
+#visual-editor img:hover {
+    outline: 2px solid #ff7700 !important;
+    cursor: pointer !important;
+}

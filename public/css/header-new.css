@@ -1,0 +1,108 @@
+/* --- ОСНОВНАЯ ШАПКА --- */
+body header {
+    background: #000000 !important;
+    border-bottom: 1px solid #1a1a1a !important;
+    padding: 0 !important; 
+    height: 80px !important; 
+    display: flex !important;
+    align-items: center !important;
+}
+
+body .header-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 30px !important;
+    display: flex !important; 
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100%;
+    height: 100%;
+}
+
+body .nav-links { 
+    display: flex !important; 
+    list-style: none !important; 
+    gap: 25px !important; 
+    margin: 0 !important;
+    padding: 0 !important;
+    align-items: center !important;
+}
+
+body .nav-links a {
+    color: #ffffff !important;
+    text-decoration: none !important;
+    font-size: 12px !important;
+    font-weight: 900;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+
+body .nav-links a:hover {
+    color: #ff4d00 !important;
+}
+
+body .logo img { 
+    height: 50px !important; 
+}
+
+/* СЕКЦИЯ ПОЛЬЗОВАТЕЛЯ */
+.header-user-section {
+    margin-left: 10px;
+    border-left: 1px solid #222;
+    padding-left: 20px;
+}
+
+.header-profile-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none !important;
+}
+
+.mini-avatar-wrapper {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #ff4d00;
+}
+
+.header-mini-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.header-username {
+    color: #fff;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+/* ССЫЛКИ ДЛЯ ГОСТЕЙ */
+.auth-guest-links {
+    display: flex;
+    gap: 15px;
+}
+
+.nav-auth-link {
+    font-size: 11px !important;
+}
+
+.signup-btn {
+    background: #ff4d00 !important;
+    color: #000 !important;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+
+/* Кнопка создания */
+body .btn-create {
+    background: #ff4d00 !important; 
+    color: #000 !important;
+    padding: 8px 16px !important;
+    border-radius: 4px !important;
+    font-weight: 900 !important;
+    font-size: 11px !important;
+}
