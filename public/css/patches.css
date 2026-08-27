@@ -1,0 +1,91 @@
+/* patches.css — недостающие стили для классов, которые используются в
+   разметке (index.php, category.php, post.php, profile.php, add_post.php),
+   но не описаны ни в одном из твоих настоящих CSS-файлов. Вынесено в
+   отдельный файл, чтобы не трогать оригинальные style2.css/admin.css и т.д. —
+   удали этот файл в любой момент, если допишешь эти стили сам в основных
+   файлах. */
+
+/* Кнопка "Опубликовать пост" / "Сохранить изменения" (add_post.php, edit_post.php) */
+.submit-btn {
+    margin-top: 20px;
+    background: #ff4d00;
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: 0.2s;
+}
+.submit-btn:hover { background: #e64500; }
+
+/* Точки-переключатели слайдера на главной (index.php) */
+.slider-nav {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 14px;
+}
+.nav-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #333;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.nav-dot.active { background: #ff4d00; }
+
+/* Сообщение "в этом разделе пока пусто" (index.php / category.php) */
+.empty-msg {
+    text-align: center;
+    color: #555;
+    padding: 60px 0;
+    font-size: 14px;
+}
+
+/* Бейдж "⚙️ ПРАВКА" на карточках постов, виден только админу (category.php) */
+.admin-edit-link {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.75);
+    color: #ff4d00;
+    border: 1px solid #ff4d00;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    text-decoration: none;
+    font-weight: bold;
+}
+.admin-edit-link:hover { background: #ff4d00; color: #000; }
+
+/* Ссылка "← Назад в раздел X" на странице поста (post.php) */
+.back-link {
+    display: inline-block;
+    transition: 0.2s;
+}
+.back-link:hover { opacity: 1 !important; color: #ff4d00 !important; }
+
+/* Профиль: дата активности, боковая колонка, бейдж подтверждения (profile.php) */
+.activity-date {
+    color: #666;
+    font-size: 11px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 4px;
+}
+.info-side {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.verify-badge {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+}

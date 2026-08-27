@@ -213,6 +213,7 @@ router.get('/add_post', requireAdmin, (req, res) => {
     <link rel="stylesheet" href="/css/admin.css">
     <link rel="stylesheet" href="/css/builder-templates.css">
     <link rel="stylesheet" href="/css/admin-editor.css">
+    <link rel="stylesheet" href="/css/patches.css">
 </head>
 <body>
 
@@ -285,6 +286,7 @@ router.get('/edit_post/:id', requireAdmin, async (req, res, next) => {
     <link rel="stylesheet" href="/css/builder-templates.css">
     <link rel="stylesheet" href="/css/admin-editor.css">
     <link rel="stylesheet" href="/css/content-styles.css">
+    <link rel="stylesheet" href="/css/patches.css">
 </head>
 <body>
 
