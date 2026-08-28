@@ -89,3 +89,35 @@
     height: 16px;
     vertical-align: middle;
 }
+
+/* ==========================================================================
+   ИСПРАВЛЕНИЕ: маленькие иконки оружия/артефактов/отряда раздувались до
+   300px+ и наезжали на соседние ячейки таблицы.
+
+   Причина (баг в оригинальном content-styles.css, не связан с переносом
+   на Node): правило "все картинки в статье" исключает картинки с классом
+   .wp-item-blank-icon, НО в реальной разметке этот класс висит на
+   родительском <div>, а не на самом <img> — поэтому исключение никогда не
+   срабатывает, и любая иконка внутри .wp-item-blank-icon тоже получает
+   min-width: 300px !important.
+
+   Фикс: явно возвращаем иконкам внутри .wp-item-blank-icon их родной
+   размер (100% от контейнера, который уже зафиксирован на 65px в
+   content-styles.css). Селектор с более высокой специфичностью и идёт
+   позже в каскаде — переопределяет "большое" правило только для иконок,
+   остальных картинок в статье не касается. */
+.entry-content .wp-item-blank-icon.wp-item-blank-icon.wp-item-blank-icon img,
+#visual-editor .wp-item-blank-icon.wp-item-blank-icon.wp-item-blank-icon img {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    display: block !important;
+    object-fit: cover !important;
+}
+.entry-content .wp-item-blank-icon,
+#visual-editor .wp-item-blank-icon {
+    overflow: hidden !important;
+}

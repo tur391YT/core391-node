@@ -30,8 +30,7 @@ function templatePanelHtml() {
   return `
   <div class="template-panel">
     <button type="button" class="template-btn" onclick="insertTemplate('sectionTitle')">+ Заголовок</button>
-    <button type="button" class="template-btn" onclick="insertTemplate('weaponCard')">+ Оружие</button>
-    <button type="button" class="template-btn" onclick="insertTemplate('artifactCard')">+ Артефакт</button>
+    <button type="button" class="template-btn" onclick="insertTemplate('itemCard')">+ Предмет (оружие/артефакт)</button>
     <button type="button" class="template-btn" onclick="insertTemplate('teamSlots')">+ Отряд</button>
     <button type="button" class="template-btn" onclick="insertTemplate('prosCons')">+ Плюсы/Минусы</button>
     <button type="button" class="template-btn" onclick="addRow()">+ Строка таблицы</button>
@@ -172,9 +171,13 @@ router.get('/post/:id', async (req, res, next) => {
     const displayGame = gameTitles[post.category] || post.category;
     const finalBg = post.banner_wide || resolveImagePath(post.image);
     const themeClass = post.category === 'wuwa' ? 'theme-wuwa' : '';
+    // bodyClass — та же карта, что и в /category, чтобы оформление по игре
+    // (цвет акцента, шрифт заголовков) применялось и на странице поста, а
+    // не только на странице раздела.
+    const bodyClass = (GAME_SETTINGS[post.category] && GAME_SETTINGS[post.category].class) || '';
     const isAdmin = req.session.admin === true;
 
-    res.send(`${renderHeader({ title: post.title, session: req.session })}
+    res.send(`${renderHeader({ title: post.title, bodyClass, session: req.session })}
     <link rel="stylesheet" href="/css/content-styles.css">
     <section class="hero" style="background-image: url('${escapeHtml(finalBg)}');">
       <div class="hero-overlay"></div>

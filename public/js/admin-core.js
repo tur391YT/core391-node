@@ -16,25 +16,32 @@ document.addEventListener('DOMContentLoaded', () => {
     // НАБОР ТОЧЕЧНЫХ ШАБЛОНОВ CORE 391
     // ==========================================
     const CORE_TEMPLATES = {
-        // 1. Одиночная карточка оружия
-        weaponCard: `
+        // 1. Универсальная карточка предмета (раньше было два разных шаблона —
+        // "Оружие" и "Артефакт" — со своей вёрсткой у каждого. Объединены в
+        // один: смысл (иконка + название + звёзды + описание эффекта) один и
+        // тот же для обоих случаев, просто раньше оружие оформлялось таблицей,
+        // а артефакт — отдельной flex-сеткой. Теперь оба типа используют
+        // одну и ту же таблицу — заодно кнопки "+ Строка"/"- Строка" ниже
+        // начинают работать одинаково что для оружия, что для артефакта
+        // (раньше они умели находить только таблицу оружия).
+        itemCard: `
             <div class="wp-table-wrapper">
                 <table class="wp-table-weapon">
                     <thead>
                         <tr>
-                            <th style="width: 30%;">ОРУЖИЕ</th>
+                            <th style="width: 30%;">ПРЕДМЕТ</th>
                             <th>ЭФФЕКТ / ХАРАКТЕРИСТИКИ</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td class="wp-cell-center">
-                                <img src="${PLACEHOLDER_IMG}" class="wp-avatar-img" alt="Оружие" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer;">
-                                <div class="wp-item-name">Название оружия</div>
+                                <img src="${PLACEHOLDER_IMG}" class="wp-avatar-img" alt="Предмет" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer;">
+                                <div class="wp-item-name">Название предмета</div>
                                 <div style="color: #ffcc00;">★★★★★</div>
                             </td>
                             <td class="wp-cell-effect">
-                                <p>Описание пассивного бонуса и характеристик...</p>
+                                <p>Описание эффекта, пассивного бонуса или комплекта...</p>
                             </td>
                         </tr>
                     </tbody>
@@ -43,25 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <p></p>
         `,
 
-        // 2. Блок артефакта / комплекта
-        artifactCard: `
-            <div class="wp-artifacts-container">
-                <div class="wp-grid-echo" style="display: flex; gap: 20px;">
-                    <div class="wp-echo-card-left" style="flex: 1; text-align: center;">
-                        <div class="wp-block-header-text" style="color: #ff7700; font-weight: bold; margin-bottom: 10px;">КОМПЛЕКТ</div>
-                        <img src="${PLACEHOLDER_IMG}" class="wp-avatar-img" alt="Артефакт" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; cursor: pointer; margin-bottom: 10px;">
-                        <div class="wp-item-name" style="font-weight: bold;">Название фулл-комплекта</div>
-                    </div>
-                    <div class="wp-echo-card-right" style="flex: 1;">
-                        <div class="wp-block-header-text" style="color: #ff7700; font-weight: bold; margin-bottom: 10px;">РЕКОМЕНДАЦИИ</div>
-                        <p>Описание бонусов и почему этот сет подходит...</p>
-                    </div>
-                </div>
-            </div>
-            <p></p>
-        `,
-
-        // 3. Блок отряда на 4 слота
+        // 2. Блок отряда на 4 слота
         teamSlots: `
             <div class="wp-team-slots" style="display: flex; gap: 10px;">
                 <div class="wp-slot" style="text-align: center; flex: 1;">
@@ -88,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <p></p>
         `,
 
-        // 4. Блок преимуществ и недостатков
+        // 3. Блок преимуществ и недостатков
         prosCons: `
             <div class="wp-pros-cons-container">
                 <div class="pros-box">
@@ -103,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <p></p>
         `,
 
-        // 5. Оранжевый заголовок
+        // 4. Оранжевый заголовок
         sectionTitle: `
             <h2 class="wp-section-title">ЗАГОЛОВОК СЕКЦИИ</h2>
             <p></p>
