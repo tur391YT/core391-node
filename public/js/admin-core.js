@@ -5,38 +5,34 @@ document.addEventListener('DOMContentLoaded', () => {
     // Картинка-заглушка для новых блоков
     const PLACEHOLDER_IMG = 'https://via.placeholder.com/100x100/222222/888888?text=IMG';
 
-    // Авто-синхронизация с скрытым полем отправки формы
-    function syncData() {
-        if (visualEditor && hiddenInput) {
-            hiddenInput.value = visualEditor.innerHTML;
-        }
-    }
+    // Как называется "снаряжение" в каждой игре — используется кнопкой
+    // "+ Предмет", чтобы подставлять нужное слово в зависимости от того,
+    // какая игра выбрана в select#game-category на момент вставки блока.
+    const GAME_ITEM_LABELS = {
+        genshin: 'АРТЕФАКТ',
+        wuwa: 'ЭХО',
+        hsr: 'РЕЛИКВИЯ',
+        zzz: 'ДИСК ДРАЙВА'
+    };
 
-    // ==========================================
-    // НАБОР ТОЧЕЧНЫХ ШАБЛОНОВ CORE 391
-    // ==========================================
-    const CORE_TEMPLATES = {
-        // 1. Универсальная карточка предмета (раньше было два разных шаблона —
-        // "Оружие" и "Артефакт" — со своей вёрсткой у каждого. Объединены в
-        // один: смысл (иконка + название + звёзды + описание эффекта) один и
-        // тот же для обоих случаев, просто раньше оружие оформлялось таблицей,
-        // а артефакт — отдельной flex-сеткой. Теперь оба типа используют
-        // одну и ту же таблицу — заодно кнопки "+ Строка"/"- Строка" ниже
-        // начинают работать одинаково что для оружия, что для артефакта
-        // (раньше они умели находить только таблицу оружия).
-        itemCard: `
+    function buildItemCardHtml() {
+        const gameSelect = document.getElementById('game-category');
+        const gameValue = gameSelect ? gameSelect.value : '';
+        const label = GAME_ITEM_LABELS[gameValue] || 'ПРЕДМЕТ';
+
+        return `
             <div class="wp-table-wrapper">
                 <table class="wp-table-weapon">
                     <thead>
                         <tr>
-                            <th style="width: 30%;">ПРЕДМЕТ</th>
+                            <th style="width: 30%;">${label}</th>
                             <th>ЭФФЕКТ / ХАРАКТЕРИСТИКИ</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td class="wp-cell-center">
-                                <img src="${PLACEHOLDER_IMG}" class="wp-avatar-img" alt="Предмет" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer;">
+                                <img src="${PLACEHOLDER_IMG}" class="wp-avatar-img" alt="${label}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer;">
                                 <div class="wp-item-name">Название предмета</div>
                                 <div style="color: #ffcc00;">★★★★★</div>
                             </td>
@@ -48,9 +44,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 </table>
             </div>
             <p></p>
-        `,
+        `;
+    }
 
-        // 2. Блок отряда на 4 слота
+    // Авто-синхронизация с скрытым полем отправки формы
+    function syncData() {
+        if (visualEditor && hiddenInput) {
+            hiddenInput.value = visualEditor.innerHTML;
+        }
+    }
+
+    // ==========================================
+    // НАБОР ТОЧЕЧНЫХ ШАБЛОНОВ CORE 391
+    // ==========================================
+    const CORE_TEMPLATES = {
+        // 1. Блок отряда на 4 слота
         teamSlots: `
             <div class="wp-team-slots" style="display: flex; gap: 10px;">
                 <div class="wp-slot" style="text-align: center; flex: 1;">
@@ -77,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <p></p>
         `,
 
-        // 3. Блок преимуществ и недостатков
+        // 2. Блок преимуществ и недостатков
         prosCons: `
             <div class="wp-pros-cons-container">
                 <div class="pros-box">
@@ -92,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <p></p>
         `,
 
-        // 4. Оранжевый заголовок
+        // 3. Оранжевый заголовок
         sectionTitle: `
             <h2 class="wp-section-title">ЗАГОЛОВОК СЕКЦИИ</h2>
             <p></p>
@@ -136,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ФУНКЦИИ КНОПОК
     // ==========================================
     window.insertTemplate = function(type) {
-        const html = CORE_TEMPLATES[type];
+        const html = type === 'itemCard' ? buildItemCardHtml() : CORE_TEMPLATES[type];
         if (!html) return;
 
         if (visualEditor) {
@@ -182,6 +190,68 @@ document.addEventListener('DOMContentLoaded', () => {
         if (row && confirm("Удалить выбранную строку?")) { 
             row.remove(); 
             syncData(); 
+        }
+    };
+
+    // Добавление слота в блок "Отряд" (.wp-team-slots — не таблица, поэтому
+    // отдельные функции, а не переиспользование addRow/deleteRow)
+    window.addSlot = function() {
+        const sel = window.getSelection();
+        let container = sel.anchorNode?.parentElement?.closest('.wp-team-slots');
+
+        // Если курсор сейчас не внутри блока отряда — берём последний
+        // вставленный в редакторе блок отряда
+        if (!container && visualEditor) {
+            const all = visualEditor.querySelectorAll('.wp-team-slots');
+            container = all[all.length - 1];
+        }
+
+        if (!container) {
+            alert('Сначала добавьте блок "+ Отряд", затем поставьте курсор внутрь него и нажмите "+ Слот отряда"');
+            return;
+        }
+
+        const lastSlot = container.querySelector('.wp-slot:last-child');
+        let newSlot;
+
+        if (lastSlot) {
+            newSlot = lastSlot.cloneNode(true);
+            const nameEl = newSlot.querySelector('.wp-slot-name');
+            if (nameEl) nameEl.textContent = 'Персонаж';
+        } else {
+            newSlot = document.createElement('div');
+            newSlot.className = 'wp-slot';
+            newSlot.style.cssText = 'text-align: center; flex: 1;';
+            newSlot.innerHTML = `
+                <div class="wp-slot-role" style="color: #aaa; font-weight: bold;">УЧАСТНИК</div>
+                <img src="${PLACEHOLDER_IMG}" alt="Персонаж" style="width: 60px; height: 60px; border-radius: 8px; cursor: pointer; margin: 5px 0;">
+                <div class="wp-slot-name">Персонаж</div>
+            `;
+        }
+
+        container.appendChild(newSlot);
+        syncData();
+    };
+
+    // Удаление слота из блока "Отряд" — оставляет минимум 1 слот
+    window.deleteSlot = function() {
+        const sel = window.getSelection();
+        const slot = sel.anchorNode?.parentElement?.closest('.wp-slot');
+
+        if (!slot) {
+            alert('Поставьте курсор внутрь слота отряда, который нужно удалить');
+            return;
+        }
+
+        const container = slot.closest('.wp-team-slots');
+        if (container && container.querySelectorAll('.wp-slot').length <= 1) {
+            alert('В отряде должен остаться хотя бы один слот');
+            return;
+        }
+
+        if (confirm('Удалить этот слот отряда?')) {
+            slot.remove();
+            syncData();
         }
     };
 });

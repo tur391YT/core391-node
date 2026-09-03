@@ -30,9 +30,12 @@ function templatePanelHtml() {
   return `
   <div class="template-panel">
     <button type="button" class="template-btn" onclick="insertTemplate('sectionTitle')">+ Заголовок</button>
-    <button type="button" class="template-btn" onclick="insertTemplate('itemCard')">+ Предмет (оружие/артефакт)</button>
+    <button type="button" class="template-btn" onclick="insertTemplate('itemCard')">+ Снаряжение</button>
     <button type="button" class="template-btn" onclick="insertTemplate('teamSlots')">+ Отряд</button>
+    <button type="button" class="template-btn" onclick="addSlot()">+ Слот отряда</button>
+    <button type="button" class="template-btn" onclick="deleteSlot()">- Слот отряда</button>
     <button type="button" class="template-btn" onclick="insertTemplate('prosCons')">+ Плюсы/Минусы</button>
+    <button type="button" class="template-btn" onclick="insertImageBlock()">+ Картинка</button>
     <button type="button" class="template-btn" onclick="addRow()">+ Строка таблицы</button>
     <button type="button" class="template-btn" onclick="deleteRow()">- Удалить строку</button>
   </div>`;
@@ -234,6 +237,16 @@ router.get('/add_post', requireAdmin, (req, res) => {
             <select id="game-category" name="game_category">${options}</select>
         </div>
 
+        <div class="form-group">
+            <label for="image">Обложка (URL) — используется на карточках в разделе и на главной:</label>
+            <input type="text" id="image" name="image" placeholder="https://... или img/posts/cover.jpg">
+        </div>
+
+        <div class="form-group">
+            <label for="banner_wide">Широкий баннер (URL) — фон шапки самого поста, необязательно:</label>
+            <input type="text" id="banner_wide" name="banner_wide" placeholder="https://... (если не заполнить, возьмётся обложка)">
+        </div>
+
         ${templatePanelHtml()}
 
         <div id="visual-editor" contenteditable="true" class="editor-area">
@@ -255,12 +268,14 @@ router.post('/add_post', requireAdmin, async (req, res, next) => {
     const title = (req.body.title || '').trim();
     const game = (req.body.game_category || '').trim();
     const content = (req.body.content || '').trim();
+    const image = (req.body.image || '').trim() || null;
+    const bannerWide = (req.body.banner_wide || '').trim() || null;
 
     if (!title || !content) return res.status(400).send('Заполните заголовок и содержание.');
 
     await pool.query(
-      'INSERT INTO posts (title, category, content) VALUES (?, ?, ?)',
-      [title, game, content]
+      'INSERT INTO posts (title, category, content, image, banner_wide) VALUES (?, ?, ?, ?, ?)',
+      [title, game, content, image, bannerWide]
     );
 
     res.redirect('/');
@@ -302,8 +317,18 @@ router.get('/edit_post/:id', requireAdmin, async (req, res, next) => {
             <input type="text" name="title" value="${escapeHtml(post.title)}" required>
         </div>
         <div class="form-group">
-            <label>Игра:</label>
-            <select name="game_category">${options}</select>
+            <label for="game-category">Игра:</label>
+            <select id="game-category" name="game_category">${options}</select>
+        </div>
+
+        <div class="form-group">
+            <label for="image">Обложка (URL) — используется на карточках в разделе и на главной:</label>
+            <input type="text" id="image" name="image" value="${escapeHtml(post.image || '')}" placeholder="https://... или img/posts/cover.jpg">
+        </div>
+
+        <div class="form-group">
+            <label for="banner_wide">Широкий баннер (URL) — фон шапки самого поста, необязательно:</label>
+            <input type="text" id="banner_wide" name="banner_wide" value="${escapeHtml(post.banner_wide || '')}" placeholder="https://... (если не заполнить, возьмётся обложка)">
         </div>
 
         ${templatePanelHtml()}
@@ -326,10 +351,15 @@ router.post('/edit_post/:id', requireAdmin, async (req, res, next) => {
     const title = (req.body.title || '').trim();
     const game = (req.body.game_category || '').trim();
     const content = (req.body.content || '').trim();
+    const image = (req.body.image || '').trim() || null;
+    const bannerWide = (req.body.banner_wide || '').trim() || null;
 
     if (!title || !content) return res.status(400).send('Заполните заголовок и содержание.');
 
-    await pool.query('UPDATE posts SET title = ?, category = ?, content = ? WHERE id = ?', [title, game, content, id]);
+    await pool.query(
+      'UPDATE posts SET title = ?, category = ?, content = ?, image = ?, banner_wide = ? WHERE id = ?',
+      [title, game, content, image, bannerWide, id]
+    );
     res.redirect(`/edit_post/${id}?success=1`);
   } catch (err) { next(err); }
 });
