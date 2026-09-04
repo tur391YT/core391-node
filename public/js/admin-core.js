@@ -130,6 +130,48 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Вставка картинок через Ctrl+V из буфера обмена. Если курсор сейчас
+        // внутри маленькой иконки (Снаряжение/Отряд) — подменяем именно её
+        // src, сохраняя маленький фиксированный размер. Иначе вставляем как
+        // крупную иллюстрацию (class="full-width") в место курсора.
+        visualEditor.addEventListener('paste', (e) => {
+            const items = e.clipboardData?.items;
+            if (!items) return;
+
+            let imageFile = null;
+            for (const item of items) {
+                if (item.type && item.type.startsWith('image/')) {
+                    imageFile = item.getAsFile();
+                    break;
+                }
+            }
+            // Если в буфере не картинка (просто текст) — не мешаем обычной вставке
+            if (!imageFile) return;
+
+            e.preventDefault();
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const dataUrl = event.target.result;
+                const sel = window.getSelection();
+                const iconWrapper = sel.anchorNode?.parentElement?.closest('.wp-item-blank-icon, .wp-slot');
+                const existingImg = iconWrapper ? iconWrapper.querySelector('img') : null;
+
+                if (existingImg) {
+                    // Курсор был внутри иконки снаряжения/слота отряда —
+                    // просто меняем картинку на месте, размер не трогаем
+                    existingImg.src = dataUrl;
+                } else {
+                    // Обычное место в тексте — вставляем как крупную иллюстрацию
+                    visualEditor.focus();
+                    const imgHtml = `<img src="${dataUrl}" alt="Вставленная картинка" class="full-width">`;
+                    document.execCommand('insertHTML', false, imgHtml);
+                }
+                syncData();
+            };
+            reader.readAsDataURL(imageFile);
+        });
+
         // Блокируем стандартный ввод текста прямо «внутрь» картинки
         visualEditor.addEventListener('keydown', (e) => {
             if (e.target.tagName === 'IMG') {
@@ -159,7 +201,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const url = prompt('Укажите путь к картинке (например: img/posts/banner.jpg или URL):');
         if (url && url.trim() !== '' && visualEditor) {
             visualEditor.focus();
-            const imgHtml = `<p><img src="${url.trim()}" alt="Картинка статьи"></p><p></p>`;
+            // class="full-width" — штатное исключение из admin.css: без него
+            // #visual-editor img по умолчанию считается маленькой иконкой
+            // (45×45px), а этот класс явно говорит "это крупная иллюстрация".
+            const imgHtml = `<p><img src="${url.trim()}" alt="Картинка статьи" class="full-width"></p><p></p>`;
             document.execCommand('insertHTML', false, imgHtml);
             syncData();
         }

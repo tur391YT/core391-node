@@ -121,3 +121,32 @@
 #visual-editor .wp-item-blank-icon {
     overflow: hidden !important;
 }
+
+/* ==========================================================================
+   Крупные иллюстрации (класс full-width — ставится автоматически кнопкой
+   "+ Картинка" и при вставке через Ctrl+V мимо иконок). Единый вид
+   независимо от того, вертикальная исходная картинка или горизонтальная:
+   фиксированная высота + object-fit:cover аккуратно кадрирует любую
+   пропорцию, не давая портретным фото становиться неоправданно высокими.
+
+   Специфичность искусственно поднята (повтор класса), чтобы гарантированно
+   перебить общее правило "все картинки статьи" из content-styles.css. */
+.entry-content img.full-width.full-width.full-width,
+#visual-editor img.full-width.full-width.full-width {
+    width: 100% !important;
+    height: 420px !important;
+    max-height: 420px !important;
+    min-width: 0 !important;
+    object-fit: cover !important;
+    display: block !important;
+    margin: 20px auto !important;
+    border-radius: 12px !important;
+}
+
+@media (max-width: 700px) {
+    .entry-content img.full-width.full-width.full-width,
+    #visual-editor img.full-width.full-width.full-width {
+        height: 260px !important;
+        max-height: 260px !important;
+    }
+}
