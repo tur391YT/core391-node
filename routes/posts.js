@@ -209,6 +209,11 @@ router.get('/post/:id', async (req, res, next) => {
 // ---------- Добавление поста (автономная страница, только админ) ----------
 router.get('/add_post', requireAdmin, (req, res) => {
   const options = GAME_OPTIONS.map(g => `<option value="${g}">${GAME_LABELS[g]}</option>`).join('');
+  const initialGame = GAME_OPTIONS[0];
+  const initialBodyClass = GAME_SETTINGS[initialGame].class;
+  const gameBodyClassMap = JSON.stringify(
+    Object.fromEntries(GAME_OPTIONS.map(g => [g, GAME_SETTINGS[g].class]))
+  );
 
   res.send(`<!DOCTYPE html>
 <html lang="ru">
@@ -221,8 +226,9 @@ router.get('/add_post', requireAdmin, (req, res) => {
     <link rel="stylesheet" href="/css/admin-editor.css">
     <link rel="stylesheet" href="/css/content-styles.css">
     <link rel="stylesheet" href="/css/patches.css">
+    <link rel="stylesheet" href="/css/game-themes.css">
 </head>
-<body>
+<body class="${initialBodyClass}">
 
 <div class="admin-container">
     <h1>Создать новый гайд / пост</h1>
@@ -260,6 +266,18 @@ router.get('/add_post', requireAdmin, (req, res) => {
     </form>
 </div>
 ${EDITOR_SCRIPTS}
+<script>
+    // Живая смена оформления по игре прямо в редакторе — тот же класс,
+    // что назначается <body> на живых страницах сайта (category.php/post.php)
+    (function () {
+        const gameBodyClass = ${gameBodyClassMap};
+        const select = document.getElementById('game-category');
+        if (!select) return;
+        select.addEventListener('change', function () {
+            document.body.className = gameBodyClass[this.value] || '';
+        });
+    })();
+</script>
 </body>
 </html>`);
 });
@@ -294,6 +312,10 @@ router.get('/edit_post/:id', requireAdmin, async (req, res, next) => {
     const success = req.query.success ? `<div class="success-msg">Изменения успешно сохранены!</div>` : '';
     const options = GAME_OPTIONS.map(g =>
       `<option value="${g}" ${post.category === g ? 'selected' : ''}>${GAME_LABELS[g]}</option>`).join('');
+    const initialBodyClass = (GAME_SETTINGS[post.category] && GAME_SETTINGS[post.category].class) || '';
+    const gameBodyClassMap = JSON.stringify(
+      Object.fromEntries(GAME_OPTIONS.map(g => [g, GAME_SETTINGS[g].class]))
+    );
 
     res.send(`<!DOCTYPE html>
 <html lang="ru">
@@ -306,8 +328,9 @@ router.get('/edit_post/:id', requireAdmin, async (req, res, next) => {
     <link rel="stylesheet" href="/css/admin-editor.css">
     <link rel="stylesheet" href="/css/content-styles.css">
     <link rel="stylesheet" href="/css/patches.css">
+    <link rel="stylesheet" href="/css/game-themes.css">
 </head>
-<body>
+<body class="${initialBodyClass}">
 
 <div class="admin-container">
     <h1>Редактирование поста #${post.id}</h1>
@@ -341,6 +364,18 @@ router.get('/edit_post/:id', requireAdmin, async (req, res, next) => {
     </form>
 </div>
 ${EDITOR_SCRIPTS}
+<script>
+    // Живая смена оформления по игре прямо в редакторе — тот же класс,
+    // что назначается <body> на живых страницах сайта (category.php/post.php)
+    (function () {
+        const gameBodyClass = ${gameBodyClassMap};
+        const select = document.getElementById('game-category');
+        if (!select) return;
+        select.addEventListener('change', function () {
+            document.body.className = gameBodyClass[this.value] || '';
+        });
+    })();
+</script>
 </body>
 </html>`);
   } catch (err) { next(err); }

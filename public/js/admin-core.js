@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.onload = (event) => {
                 const dataUrl = event.target.result;
                 const sel = window.getSelection();
-                const iconWrapper = sel.anchorNode?.parentElement?.closest('.wp-item-blank-icon, .wp-slot');
+                const iconWrapper = sel.anchorNode?.parentElement?.closest('.wp-item-blank-icon, .wp-slot, .wp-cell-center');
                 const existingImg = iconWrapper ? iconWrapper.querySelector('img') : null;
 
                 if (existingImg) {

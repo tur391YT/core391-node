@@ -150,3 +150,22 @@
         max-height: 260px !important;
     }
 }
+
+/* ==========================================================================
+   ИСПРАВЛЕНИЕ: та же проблема, что и с иконкой оружия/артефакта, но теперь
+   у иконок в блоке "Отряд" (.wp-slot img). Там картинка стоит без обёртки
+   .wp-item-blank-icon, только с инлайн-стилем width:60px — общее правило
+   "все картинки статьи ≥300px !important" из content-styles.css всё равно
+   его перебивает (внешний !important всегда сильнее инлайн-стиля без
+   !important). Возвращаем иконкам отряда их родной маленький размер. */
+.entry-content .wp-slot.wp-slot.wp-slot img,
+#visual-editor .wp-slot.wp-slot.wp-slot img {
+    width: 60px !important;
+    height: 60px !important;
+    min-width: 0 !important;
+    max-width: 60px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    display: inline-block !important;
+    margin: 5px 0 !important;
+}
