@@ -254,6 +254,11 @@ router.get('/add_post', requireAdmin, (req, res) => {
             <input type="text" id="banner_wide" name="banner_wide" placeholder="https://... (если не заполнить, возьмётся обложка)">
         </div>
 
+        <div class="form-group">
+            <label for="sub_category">Подкатегория (бейдж на карточке) — например: БИЛД, ГАЙД, НОВОСТИ:</label>
+            <input type="text" id="sub_category" name="sub_category" value="БИЛД" placeholder="БИЛД">
+        </div>
+
         ${templatePanelHtml()}
 
         <div id="visual-editor" contenteditable="true" class="editor-area">
@@ -289,12 +294,13 @@ router.post('/add_post', requireAdmin, async (req, res, next) => {
     const content = (req.body.content || '').trim();
     const image = (req.body.image || '').trim() || null;
     const bannerWide = (req.body.banner_wide || '').trim() || null;
+    const subCategory = (req.body.sub_category || '').trim() || 'БИЛД';
 
     if (!title || !content) return res.status(400).send('Заполните заголовок и содержание.');
 
     await pool.query(
-      'INSERT INTO posts (title, category, content, image, banner_wide) VALUES (?, ?, ?, ?, ?)',
-      [title, game, content, image, bannerWide]
+      'INSERT INTO posts (title, category, content, image, banner_wide, sub_category) VALUES (?, ?, ?, ?, ?, ?)',
+      [title, game, content, image, bannerWide, subCategory]
     );
 
     res.redirect('/');
@@ -355,6 +361,11 @@ router.get('/edit_post/:id', requireAdmin, async (req, res, next) => {
             <input type="text" id="banner_wide" name="banner_wide" value="${escapeHtml(post.banner_wide || '')}" placeholder="https://... (если не заполнить, возьмётся обложка)">
         </div>
 
+        <div class="form-group">
+            <label for="sub_category">Подкатегория (бейдж на карточке) — например: БИЛД, ГАЙД, НОВОСТИ:</label>
+            <input type="text" id="sub_category" name="sub_category" value="${escapeHtml(post.sub_category || 'БИЛД')}" placeholder="БИЛД">
+        </div>
+
         ${templatePanelHtml()}
 
         <div id="visual-editor" contenteditable="true" class="editor-area">${post.content || ''}</div>
@@ -389,12 +400,13 @@ router.post('/edit_post/:id', requireAdmin, async (req, res, next) => {
     const content = (req.body.content || '').trim();
     const image = (req.body.image || '').trim() || null;
     const bannerWide = (req.body.banner_wide || '').trim() || null;
+    const subCategory = (req.body.sub_category || '').trim() || 'БИЛД';
 
     if (!title || !content) return res.status(400).send('Заполните заголовок и содержание.');
 
     await pool.query(
-      'UPDATE posts SET title = ?, category = ?, content = ?, image = ?, banner_wide = ? WHERE id = ?',
-      [title, game, content, image, bannerWide, id]
+      'UPDATE posts SET title = ?, category = ?, content = ?, image = ?, banner_wide = ?, sub_category = ? WHERE id = ?',
+      [title, game, content, image, bannerWide, subCategory, id]
     );
     res.redirect(`/edit_post/${id}?success=1`);
   } catch (err) { next(err); }

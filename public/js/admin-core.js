@@ -152,22 +152,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const reader = new FileReader();
             reader.onload = (event) => {
-                const dataUrl = event.target.result;
-                const sel = window.getSelection();
-                const iconWrapper = sel.anchorNode?.parentElement?.closest('.wp-item-blank-icon, .wp-slot, .wp-cell-center');
-                const existingImg = iconWrapper ? iconWrapper.querySelector('img') : null;
+                const img = new Image();
+                img.onload = () => {
+                    // Сжимаем картинку перед вставкой — скриншоты и фото с
+                    // телефона легко весят 10-25 МБ в исходном виде, что
+                    // раздувает пост и упирается в лимиты сервера. Уменьшаем
+                    // до разумного размера и переводим в JPEG — для
+                    // иллюстраций в статье этого более чем достаточно.
+                    const MAX_DIM = 1600;
+                    let { width, height } = img;
+                    if (width > MAX_DIM || height > MAX_DIM) {
+                        const scale = MAX_DIM / Math.max(width, height);
+                        width = Math.round(width * scale);
+                        height = Math.round(height * scale);
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
 
-                if (existingImg) {
-                    // Курсор был внутри иконки снаряжения/слота отряда —
-                    // просто меняем картинку на месте, размер не трогаем
-                    existingImg.src = dataUrl;
-                } else {
-                    // Обычное место в тексте — вставляем как крупную иллюстрацию
-                    visualEditor.focus();
-                    const imgHtml = `<img src="${dataUrl}" alt="Вставленная картинка" class="full-width">`;
-                    document.execCommand('insertHTML', false, imgHtml);
-                }
-                syncData();
+                    const sel = window.getSelection();
+                    const iconWrapper = sel.anchorNode?.parentElement?.closest('.wp-item-blank-icon, .wp-slot, .wp-cell-center');
+                    const existingImg = iconWrapper ? iconWrapper.querySelector('img') : null;
+
+                    if (existingImg) {
+                        // Курсор был внутри иконки снаряжения/слота отряда —
+                        // просто меняем картинку на месте, размер не трогаем
+                        existingImg.src = dataUrl;
+                    } else {
+                        // Обычное место в тексте — вставляем как крупную иллюстрацию
+                        visualEditor.focus();
+                        const imgHtml = `<img src="${dataUrl}" alt="Вставленная картинка" class="full-width">`;
+                        document.execCommand('insertHTML', false, imgHtml);
+                    }
+                    syncData();
+                };
+                img.src = event.target.result;
             };
             reader.readAsDataURL(imageFile);
         });
