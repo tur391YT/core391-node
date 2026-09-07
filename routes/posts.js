@@ -8,14 +8,14 @@ const GAME_SETTINGS = {
   genshin: { title: 'Genshin Impact', class: 'genshin' },
   zzz: { title: 'Zenless Zone Zero', class: 'zzz' },
   wuwa: { title: 'Wuthering Waves', class: 'wuwa' },
-  hsr: { title: 'Honkai Star Rail', class: 'star-rail' }
+  hsr: { title: 'Honkai Star Rail', class: 'star-rail' },
 };
 
 const GAME_BANNERS = {
   genshin: 'https://i.pinimg.com/1200x/0a/84/9d/0a849d1db2e9b5c7b6a5d196d399f81a.jpg',
   zzz: 'https://i.pinimg.com/1200x/ac/c0/26/acc02683542b899c52129a232b43cb61.jpg',
   wuwa: 'https://i.pinimg.com/736x/f3/27/70/f32770d88f356fefbd53de6b40748bc8.jpg',
-  hsr: 'https://i.pinimg.com/1200x/22/15/b9/2215b99842d6d7b7a96891fc06367a83.jpg'
+  hsr: 'https://i.pinimg.com/1200x/22/15/b9/2215b99842d6d7b7a96891fc06367a83.jpg',
 };
 
 const GAME_OPTIONS = ['genshin', 'wuwa', 'hsr', 'zzz'];
@@ -23,7 +23,7 @@ const GAME_LABELS = {
   genshin: 'Genshin Impact',
   wuwa: 'Wuthering Waves',
   hsr: 'Honkai: Star Rail',
-  zzz: 'Zenless Zone Zero'
+  zzz: 'Zenless Zone Zero',
 };
 
 function templatePanelHtml() {
@@ -54,16 +54,22 @@ router.get('/', async (req, res, next) => {
   try {
     const [sliderPosts] = await pool.query('SELECT * FROM posts ORDER BY id DESC LIMIT 3');
 
-    const slides = sliderPosts.map(post => `
+    const slides = sliderPosts
+      .map(
+        (post) => `
       <a href="/post/${post.id}" class="slide-item">
         <img src="${escapeHtml(resolveImagePath(post.image))}" alt="${escapeHtml(post.title)}">
         <div class="slide-info">
           <span class="category-badge">${escapeHtml(post.sub_category || 'ГАЙДЫ')}</span>
           <h3>${escapeHtml(post.title)}</h3>
         </div>
-      </a>`).join('');
+      </a>`,
+      )
+      .join('');
 
-    const dots = sliderPosts.map((_, i) => `<div class="nav-dot" onclick="currentSlide(${i})"></div>`).join('');
+    const dots = sliderPosts
+      .map((_, i) => `<div class="nav-dot" onclick="currentSlide(${i})"></div>`)
+      .join('');
 
     res.send(`${renderHeader({ session: req.session })}
     <section class="hero" style="background-image: url('/img/banner.png');">
@@ -118,7 +124,9 @@ router.get('/', async (req, res, next) => {
       if (dots.length > 0) { updateSlider(); setInterval(showSlides, 5000); }
     </script>
     ${renderFooter()}`);
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 });
 
 // ---------- Категория ----------
@@ -129,11 +137,15 @@ router.get('/category', async (req, res, next) => {
     const currentTitle = settings ? settings.title : game.toUpperCase();
     const bodyClass = settings ? settings.class : '';
 
-    const [posts] = await pool.query('SELECT * FROM posts WHERE category = ? ORDER BY id DESC', [game]);
+    const [posts] = await pool.query('SELECT * FROM posts WHERE category = ? ORDER BY id DESC', [
+      game,
+    ]);
     const heroBg = GAME_BANNERS[game] || (posts[0] && posts[0].banner_wide) || '/img/banner.png';
     const isAdmin = req.session.admin === true;
 
-    const cards = posts.map(post => `
+    const cards = posts
+      .map(
+        (post) => `
       <div style="position: relative; display: flex; flex-direction: column;">
         ${isAdmin ? `<a href="/edit_post/${post.id}" class="admin-edit-link">⚙️ ПРАВКА</a>` : ''}
         <a href="/post/${post.id}" class="game-card">
@@ -146,7 +158,9 @@ router.get('/category', async (req, res, next) => {
             <span class="btn-look">СМОТРЕТЬ</span>
           </div>
         </a>
-      </div>`).join('');
+      </div>`,
+      )
+      .join('');
 
     res.send(`${renderHeader({ title: `Раздел: ${currentTitle}`, bodyClass, session: req.session })}
     <section class="hero" style="background-image: url('${escapeHtml(heroBg)}');">
@@ -159,7 +173,9 @@ router.get('/category', async (req, res, next) => {
       </div>
     </main>
     ${renderFooter()}`);
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 });
 
 // ---------- Просмотр поста ----------
@@ -170,7 +186,12 @@ router.get('/post/:id', async (req, res, next) => {
     const post = rows[0];
     if (!post) return res.status(404).send('Гайд не найден.');
 
-    const gameTitles = { genshin: 'Genshin Impact', zzz: 'Zenless Zone Zero', wuwa: 'Wuthering Waves', hsr: 'Honkai Star Rail' };
+    const gameTitles = {
+      genshin: 'Genshin Impact',
+      zzz: 'Zenless Zone Zero',
+      wuwa: 'Wuthering Waves',
+      hsr: 'Honkai Star Rail',
+    };
     const displayGame = gameTitles[post.category] || post.category;
     const finalBg = post.banner_wide || resolveImagePath(post.image);
     const themeClass = post.category === 'wuwa' ? 'theme-wuwa' : '';
@@ -196,23 +217,31 @@ router.get('/post/:id', async (req, res, next) => {
         <div class="entry-content">
           ${post.content ? post.content : '<p style="color:#666;font-style:italic;">Содержание этого гайда скоро будет дополнено...</p>'}
         </div>
-        ${isAdmin ? `
+        ${
+          isAdmin
+            ? `
         <div style="margin-top:50px;padding-top:20px;border-top:1px solid #222;display:flex;justify-content:flex-end;">
           <a href="/edit_post/${post.id}" style="color:#ff4d00;text-decoration:none;font-size:0.8rem;border:1px solid #333;padding:8px 15px;border-radius:4px;">⚙️ РЕДАКТИРОВАТЬ МАТЕРИАЛ</a>
-        </div>` : ''}
+        </div>`
+            : ''
+        }
       </div>
     </main>
     ${renderFooter()}`);
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 });
 
 // ---------- Добавление поста (автономная страница, только админ) ----------
 router.get('/add_post', requireAdmin, (req, res) => {
-  const options = GAME_OPTIONS.map(g => `<option value="${g}">${GAME_LABELS[g]}</option>`).join('');
+  const options = GAME_OPTIONS.map((g) => `<option value="${g}">${GAME_LABELS[g]}</option>`).join(
+    '',
+  );
   const initialGame = GAME_OPTIONS[0];
   const initialBodyClass = GAME_SETTINGS[initialGame].class;
   const gameBodyClassMap = JSON.stringify(
-    Object.fromEntries(GAME_OPTIONS.map(g => [g, GAME_SETTINGS[g].class]))
+    Object.fromEntries(GAME_OPTIONS.map((g) => [g, GAME_SETTINGS[g].class])),
   );
 
   res.send(`<!DOCTYPE html>
@@ -301,10 +330,13 @@ router.post('/add_post', requireAdmin, async (req, res, next) => {
     await pool.query(
       'INSERT INTO posts (title, category, content, image, banner_wide, sub_category) VALUES (?, ?, ?, ?, ?, ?)',
       [title, game, content, image, bannerWide, subCategory]
+
     );
 
     res.redirect('/');
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 });
 
 // ---------- Редактирование поста (автономная страница, только админ) ----------
@@ -315,12 +347,17 @@ router.get('/edit_post/:id', requireAdmin, async (req, res, next) => {
     const post = rows[0];
     if (!post) return res.status(404).send('Пост не найден!');
 
-    const success = req.query.success ? `<div class="success-msg">Изменения успешно сохранены!</div>` : '';
-    const options = GAME_OPTIONS.map(g =>
-      `<option value="${g}" ${post.category === g ? 'selected' : ''}>${GAME_LABELS[g]}</option>`).join('');
-    const initialBodyClass = (GAME_SETTINGS[post.category] && GAME_SETTINGS[post.category].class) || '';
+    const success = req.query.success
+      ? `<div class="success-msg">Изменения успешно сохранены!</div>`
+      : '';
+    const options = GAME_OPTIONS.map(
+      (g) =>
+        `<option value="${g}" ${post.category === g ? 'selected' : ''}>${GAME_LABELS[g]}</option>`,
+    ).join('');
+    const initialBodyClass =
+      (GAME_SETTINGS[post.category] && GAME_SETTINGS[post.category].class) || '';
     const gameBodyClassMap = JSON.stringify(
-      Object.fromEntries(GAME_OPTIONS.map(g => [g, GAME_SETTINGS[g].class]))
+      Object.fromEntries(GAME_OPTIONS.map((g) => [g, GAME_SETTINGS[g].class])),
     );
 
     res.send(`<!DOCTYPE html>
@@ -389,7 +426,9 @@ ${EDITOR_SCRIPTS}
 </script>
 </body>
 </html>`);
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 });
 
 router.post('/edit_post/:id', requireAdmin, async (req, res, next) => {
@@ -406,10 +445,12 @@ router.post('/edit_post/:id', requireAdmin, async (req, res, next) => {
 
     await pool.query(
       'UPDATE posts SET title = ?, category = ?, content = ?, image = ?, banner_wide = ?, sub_category = ? WHERE id = ?',
-      [title, game, content, image, bannerWide, subCategory, id]
+      [title, game, content, image, bannerWide, subCategory, id],
     );
     res.redirect(`/edit_post/${id}?success=1`);
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 });
 
 module.exports = router;

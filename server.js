@@ -16,16 +16,18 @@ const app = express();
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.json({ limit: '50mb' }));
 
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'change-me-in-env',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    maxAge: 1000 * 60 * 60 * 24 * 7 // 7 дней
-    // secure: true, // включи, когда сайт будет работать по HTTPS
-  }
-}));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'change-me-in-env',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 дней
+      // secure: true, // включи, когда сайт будет работать по HTTPS
+    },
+  }),
+);
 
 // Статика: /css/*, /js/*, /img/*
 app.use(express.static(path.join(__dirname, 'public')));
