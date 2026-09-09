@@ -21,9 +21,9 @@ CREATE TABLE IF NOT EXISTS posts (
   id INT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
   banner_wide TEXT DEFAULT NULL,
-  content TEXT NOT NULL,
+  content LONGTEXT NOT NULL,
   category VARCHAR(50) NOT NULL,           -- genshin / wuwa / hsr / zzz
-  sub_category VARCHAR(50) DEFAULT NULL,
+  sub_category VARCHAR(50) NOT NULL,
   image VARCHAR(255) DEFAULT NULL,
   date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

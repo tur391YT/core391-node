@@ -56,6 +56,51 @@ router.get('/profile', async (req, res, next) => {
     const aY = user.avatar_pos_y ?? 0;
     const successMsg = req.query.success ? `<div class="success-msg">Профиль обновлён!</div>` : '';
 
+    // Журнал активности — что этот пользователь смотрел, а если он админ —
+    // ещё и что добавлял/редактировал на сайте
+    const [activityRows] = await pool.query(
+      'SELECT * FROM activity_log WHERE user_id = ? ORDER BY created_at DESC LIMIT 15',
+      [user.id]
+    );
+    const ACTIVITY_LABELS = {
+      viewed: 'Просмотрел(а)',
+      created: 'Добавил(а) на сайт',
+      edited: 'Отредактировал(а)'
+    };
+    const activityHtml = activityRows.length
+      ? activityRows.map(a => {
+          const label = ACTIVITY_LABELS[a.action] || a.action;
+          const dateStr = a.created_at
+            ? new Date(a.created_at).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+            : '';
+          const postLink = a.post_id
+            ? `<a href="/post/${a.post_id}" style="color:#ff5500;">${escapeHtml(a.post_title || 'пост')}</a>`
+            : escapeHtml(a.post_title || '');
+          return `<div class="activity-item"><span class="activity-date">${escapeHtml(dateStr)}</span><p>${label}: ${postLink}</p></div>`;
+        }).join('')
+      : `<div class="activity-item"><span class="activity-date">—</span><p>Пока нет активности.</p></div>`;
+
+    // Реальные публикации этого пользователя — берём из журнала активности
+    // (кто создавал посты), в самой таблице posts нет колонки "автор"
+    const [userPosts] = await pool.query(
+      `SELECT DISTINCT posts.id, posts.title, posts.image, posts.sub_category, posts.date
+       FROM activity_log
+       JOIN posts ON posts.id = activity_log.post_id
+       WHERE activity_log.user_id = ? AND activity_log.action = 'created'
+       ORDER BY posts.date DESC`,
+      [user.id]
+    );
+    const userPostsHtml = userPosts.length
+      ? `<div class="index-grid">` + userPosts.map(p => `
+          <a href="/post/${p.id}" class="game-card">
+            <img src="${escapeHtml(resolveImagePath(p.image))}" alt="${escapeHtml(p.title)}">
+            <div class="content" style="padding: 10px;">
+              <span class="category-badge">${escapeHtml(p.sub_category || 'ГАЙД')}</span>
+              <h3>${escapeHtml(p.title)}</h3>
+            </div>
+          </a>`).join('') + `</div>`
+      : `<p style="color:#444;">Здесь пока ничего нет...</p>`;
+
     const settingsBlock = isOwner ? `
       <div class="tab-content" id="settings">
         <div class="content-block">
@@ -137,14 +182,14 @@ router.get('/profile', async (req, res, next) => {
             <div class="tab-content active" id="overview">
               <div class="content-block">
                 <h3 class="block-title">Последняя активность</h3>
-                <div class="activity-item"><span class="activity-date">—</span><p>Пока нет активности.</p></div>
+                ${activityHtml}
               </div>
             </div>
 
             <div class="tab-content" id="posts">
               <div class="content-block">
                 <h3 class="block-title">Публикации</h3>
-                <p style="color:#444;">Здесь пока ничего нет...</p>
+                ${userPostsHtml}
               </div>
             </div>
 

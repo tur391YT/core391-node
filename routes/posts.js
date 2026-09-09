@@ -3,19 +3,20 @@ const router = express.Router();
 const pool = require('../config/db');
 const { renderHeader, renderFooter, escapeHtml, resolveImagePath } = require('../lib/render');
 const { requireAdmin } = require('../middleware/auth');
+const { logActivity } = require('../lib/activity');
 
 const GAME_SETTINGS = {
   genshin: { title: 'Genshin Impact', class: 'genshin' },
   zzz: { title: 'Zenless Zone Zero', class: 'zzz' },
   wuwa: { title: 'Wuthering Waves', class: 'wuwa' },
-  hsr: { title: 'Honkai Star Rail', class: 'star-rail' },
+  hsr: { title: 'Honkai Star Rail', class: 'star-rail' }
 };
 
 const GAME_BANNERS = {
   genshin: 'https://i.pinimg.com/1200x/0a/84/9d/0a849d1db2e9b5c7b6a5d196d399f81a.jpg',
   zzz: 'https://i.pinimg.com/1200x/ac/c0/26/acc02683542b899c52129a232b43cb61.jpg',
   wuwa: 'https://i.pinimg.com/736x/f3/27/70/f32770d88f356fefbd53de6b40748bc8.jpg',
-  hsr: 'https://i.pinimg.com/1200x/22/15/b9/2215b99842d6d7b7a96891fc06367a83.jpg',
+  hsr: 'https://i.pinimg.com/1200x/22/15/b9/2215b99842d6d7b7a96891fc06367a83.jpg'
 };
 
 const GAME_OPTIONS = ['genshin', 'wuwa', 'hsr', 'zzz'];
@@ -23,7 +24,7 @@ const GAME_LABELS = {
   genshin: 'Genshin Impact',
   wuwa: 'Wuthering Waves',
   hsr: 'Honkai: Star Rail',
-  zzz: 'Zenless Zone Zero',
+  zzz: 'Zenless Zone Zero'
 };
 
 function templatePanelHtml() {
@@ -34,11 +35,60 @@ function templatePanelHtml() {
     <button type="button" class="template-btn" onclick="insertTemplate('teamSlots')">+ Отряд</button>
     <button type="button" class="template-btn" onclick="addSlot()">+ Слот отряда</button>
     <button type="button" class="template-btn" onclick="deleteSlot()">- Слот отряда</button>
+    <button type="button" class="template-btn" onclick="addAltCharacter()">+ Или (альт. персонаж)</button>
     <button type="button" class="template-btn" onclick="insertTemplate('prosCons')">+ Плюсы/Минусы</button>
     <button type="button" class="template-btn" onclick="insertImageBlock()">+ Картинка</button>
     <button type="button" class="template-btn" onclick="addRow()">+ Строка таблицы</button>
     <button type="button" class="template-btn" onclick="deleteRow()">- Удалить строку</button>
   </div>`;
+}
+
+// Блок настройки позиции баннера — превью картинки с кнопкой-шестерёнкой,
+// раскрывающей ползунок вертикального положения (как на странице профиля).
+// Виден только внутри редактора (add_post/edit_post), на живом сайте нет —
+// там уже применяется сохранённое значение banner_pos_y.
+function bannerPositionEditorHtml(initialPosY) {
+  return `
+  <div class="form-group">
+    <label>Позиция баннера — нажми на шестерёнку, чтобы настроить, какая часть фото видна в шапке поста:</label>
+    <div id="banner-preview-wrap" style="position: relative; height: 180px; border-radius: 8px; overflow: hidden; background: #111 center ${initialPosY}% / cover no-repeat; border: 1px solid #26262b;">
+      <button type="button" id="banner-pos-gear" title="Настроить положение фото"
+        style="position:absolute; top:8px; right:8px; width:34px; height:34px; border-radius:50%; background:rgba(0,0,0,0.65); border:1px solid #444; color:#fff; cursor:pointer; font-size:16px; line-height:1;">⚙️</button>
+      <div id="banner-pos-slider-wrap" style="display:none; position:absolute; bottom:0; left:0; right:0; padding:12px; background:rgba(0,0,0,0.75);">
+        <input type="range" id="banner-pos-slider" min="0" max="100" value="${initialPosY}" style="width:100%;">
+      </div>
+    </div>
+    <input type="hidden" name="banner_pos_y" id="banner_pos_y" value="${initialPosY}">
+  </div>
+  <script>
+    (function () {
+      const imageInput = document.getElementById('image');
+      const bannerWideInput = document.getElementById('banner_wide');
+      const preview = document.getElementById('banner-preview-wrap');
+      const gear = document.getElementById('banner-pos-gear');
+      const sliderWrap = document.getElementById('banner-pos-slider-wrap');
+      const slider = document.getElementById('banner-pos-slider');
+      const hiddenPos = document.getElementById('banner_pos_y');
+      if (!imageInput || !preview) return;
+
+      function updatePreviewImage() {
+        const url = (bannerWideInput.value || imageInput.value || '').trim();
+        preview.style.backgroundImage = url ? "url('" + url + "')" : 'none';
+      }
+      imageInput.addEventListener('input', updatePreviewImage);
+      bannerWideInput.addEventListener('input', updatePreviewImage);
+      updatePreviewImage();
+
+      gear.addEventListener('click', function () {
+        sliderWrap.style.display = sliderWrap.style.display === 'none' ? 'block' : 'none';
+      });
+
+      slider.addEventListener('input', function () {
+        preview.style.backgroundPosition = 'center ' + slider.value + '%';
+        hiddenPos.value = slider.value;
+      });
+    })();
+  </script>`;
 }
 
 // Реальная админка грузит только admin-core.js — он сам объявляет
@@ -54,22 +104,16 @@ router.get('/', async (req, res, next) => {
   try {
     const [sliderPosts] = await pool.query('SELECT * FROM posts ORDER BY id DESC LIMIT 3');
 
-    const slides = sliderPosts
-      .map(
-        (post) => `
+    const slides = sliderPosts.map(post => `
       <a href="/post/${post.id}" class="slide-item">
         <img src="${escapeHtml(resolveImagePath(post.image))}" alt="${escapeHtml(post.title)}">
         <div class="slide-info">
           <span class="category-badge">${escapeHtml(post.sub_category || 'ГАЙДЫ')}</span>
           <h3>${escapeHtml(post.title)}</h3>
         </div>
-      </a>`,
-      )
-      .join('');
+      </a>`).join('');
 
-    const dots = sliderPosts
-      .map((_, i) => `<div class="nav-dot" onclick="currentSlide(${i})"></div>`)
-      .join('');
+    const dots = sliderPosts.map((_, i) => `<div class="nav-dot" onclick="currentSlide(${i})"></div>`).join('');
 
     res.send(`${renderHeader({ session: req.session })}
     <section class="hero" style="background-image: url('/img/banner.png');">
@@ -124,9 +168,7 @@ router.get('/', async (req, res, next) => {
       if (dots.length > 0) { updateSlider(); setInterval(showSlides, 5000); }
     </script>
     ${renderFooter()}`);
-  } catch (err) {
-    next(err);
-  }
+  } catch (err) { next(err); }
 });
 
 // ---------- Категория ----------
@@ -137,15 +179,11 @@ router.get('/category', async (req, res, next) => {
     const currentTitle = settings ? settings.title : game.toUpperCase();
     const bodyClass = settings ? settings.class : '';
 
-    const [posts] = await pool.query('SELECT * FROM posts WHERE category = ? ORDER BY id DESC', [
-      game,
-    ]);
+    const [posts] = await pool.query('SELECT * FROM posts WHERE category = ? ORDER BY id DESC', [game]);
     const heroBg = GAME_BANNERS[game] || (posts[0] && posts[0].banner_wide) || '/img/banner.png';
     const isAdmin = req.session.admin === true;
 
-    const cards = posts
-      .map(
-        (post) => `
+    const cards = posts.map(post => `
       <div style="position: relative; display: flex; flex-direction: column;">
         ${isAdmin ? `<a href="/edit_post/${post.id}" class="admin-edit-link">⚙️ ПРАВКА</a>` : ''}
         <a href="/post/${post.id}" class="game-card">
@@ -158,9 +196,7 @@ router.get('/category', async (req, res, next) => {
             <span class="btn-look">СМОТРЕТЬ</span>
           </div>
         </a>
-      </div>`,
-      )
-      .join('');
+      </div>`).join('');
 
     res.send(`${renderHeader({ title: `Раздел: ${currentTitle}`, bodyClass, session: req.session })}
     <section class="hero" style="background-image: url('${escapeHtml(heroBg)}');">
@@ -173,9 +209,7 @@ router.get('/category', async (req, res, next) => {
       </div>
     </main>
     ${renderFooter()}`);
-  } catch (err) {
-    next(err);
-  }
+  } catch (err) { next(err); }
 });
 
 // ---------- Просмотр поста ----------
@@ -186,12 +220,13 @@ router.get('/post/:id', async (req, res, next) => {
     const post = rows[0];
     if (!post) return res.status(404).send('Гайд не найден.');
 
-    const gameTitles = {
-      genshin: 'Genshin Impact',
-      zzz: 'Zenless Zone Zero',
-      wuwa: 'Wuthering Waves',
-      hsr: 'Honkai Star Rail',
-    };
+    // Записываем в активность любого залогиненного пользователя (не только
+    // админа) — не дожидаемся результата, чтобы не тормозить отдачу страницы
+    if (req.session.user_id) {
+      logActivity(req.session.user_id, 'viewed', post.id, post.title);
+    }
+
+    const gameTitles = { genshin: 'Genshin Impact', zzz: 'Zenless Zone Zero', wuwa: 'Wuthering Waves', hsr: 'Honkai Star Rail' };
     const displayGame = gameTitles[post.category] || post.category;
     const finalBg = post.banner_wide || resolveImagePath(post.image);
     const themeClass = post.category === 'wuwa' ? 'theme-wuwa' : '';
@@ -203,7 +238,7 @@ router.get('/post/:id', async (req, res, next) => {
 
     res.send(`${renderHeader({ title: post.title, bodyClass, session: req.session })}
     <link rel="stylesheet" href="/css/content-styles.css">
-    <section class="hero" style="background-image: url('${escapeHtml(finalBg)}');">
+    <section class="hero" style="background-image: url('${escapeHtml(finalBg)}'); background-position: center ${post.banner_pos_y ?? 50}%;">
       <div class="hero-overlay"></div>
       <div class="hero-content">
         <a href="/category?game=${encodeURIComponent(post.category)}" class="back-link" style="color:#fff;text-decoration:none;font-size:0.9rem;opacity:0.8;">
@@ -217,31 +252,23 @@ router.get('/post/:id', async (req, res, next) => {
         <div class="entry-content">
           ${post.content ? post.content : '<p style="color:#666;font-style:italic;">Содержание этого гайда скоро будет дополнено...</p>'}
         </div>
-        ${
-          isAdmin
-            ? `
+        ${isAdmin ? `
         <div style="margin-top:50px;padding-top:20px;border-top:1px solid #222;display:flex;justify-content:flex-end;">
-          <a href="/edit_post/${post.id}" style="color:#ff4d00;text-decoration:none;font-size:0.8rem;border:1px solid #333;padding:8px 15px;border-radius:4px;">⚙️ РЕДАКТИРОВАТЬ МАТЕРИАЛ</a>
-        </div>`
-            : ''
-        }
+          <a href="/edit_post/${post.id}" title="Редактировать материал" style="color:#ff4d00;text-decoration:none;font-size:1.1rem;border:1px solid #333;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;">⚙️</a>
+        </div>` : ''}
       </div>
     </main>
     ${renderFooter()}`);
-  } catch (err) {
-    next(err);
-  }
+  } catch (err) { next(err); }
 });
 
 // ---------- Добавление поста (автономная страница, только админ) ----------
 router.get('/add_post', requireAdmin, (req, res) => {
-  const options = GAME_OPTIONS.map((g) => `<option value="${g}">${GAME_LABELS[g]}</option>`).join(
-    '',
-  );
+  const options = GAME_OPTIONS.map(g => `<option value="${g}">${GAME_LABELS[g]}</option>`).join('');
   const initialGame = GAME_OPTIONS[0];
   const initialBodyClass = GAME_SETTINGS[initialGame].class;
   const gameBodyClassMap = JSON.stringify(
-    Object.fromEntries(GAME_OPTIONS.map((g) => [g, GAME_SETTINGS[g].class])),
+    Object.fromEntries(GAME_OPTIONS.map(g => [g, GAME_SETTINGS[g].class]))
   );
 
   res.send(`<!DOCTYPE html>
@@ -288,6 +315,8 @@ router.get('/add_post', requireAdmin, (req, res) => {
             <input type="text" id="sub_category" name="sub_category" value="БИЛД" placeholder="БИЛД">
         </div>
 
+        ${bannerPositionEditorHtml(50)}
+
         ${templatePanelHtml()}
 
         <div id="visual-editor" contenteditable="true" class="editor-area">
@@ -324,19 +353,20 @@ router.post('/add_post', requireAdmin, async (req, res, next) => {
     const image = (req.body.image || '').trim() || null;
     const bannerWide = (req.body.banner_wide || '').trim() || null;
     const subCategory = (req.body.sub_category || '').trim() || 'БИЛД';
+    const bannerPosY = parseInt(req.body.banner_pos_y, 10);
+    const bannerPosYSafe = Number.isFinite(bannerPosY) ? Math.min(100, Math.max(0, bannerPosY)) : 50;
 
     if (!title || !content) return res.status(400).send('Заполните заголовок и содержание.');
 
-    await pool.query(
-      'INSERT INTO posts (title, category, content, image, banner_wide, sub_category) VALUES (?, ?, ?, ?, ?, ?)',
-      [title, game, content, image, bannerWide, subCategory]
-
+    const [result] = await pool.query(
+      'INSERT INTO posts (title, category, content, image, banner_wide, sub_category, banner_pos_y) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [title, game, content, image, bannerWide, subCategory, bannerPosYSafe]
     );
 
-    res.redirect('/');
-  } catch (err) {
-    next(err);
-  }
+    logActivity(req.session.user_id, 'created', result.insertId, title);
+
+    res.redirect(`/post/${result.insertId}`);
+  } catch (err) { next(err); }
 });
 
 // ---------- Редактирование поста (автономная страница, только админ) ----------
@@ -347,17 +377,12 @@ router.get('/edit_post/:id', requireAdmin, async (req, res, next) => {
     const post = rows[0];
     if (!post) return res.status(404).send('Пост не найден!');
 
-    const success = req.query.success
-      ? `<div class="success-msg">Изменения успешно сохранены!</div>`
-      : '';
-    const options = GAME_OPTIONS.map(
-      (g) =>
-        `<option value="${g}" ${post.category === g ? 'selected' : ''}>${GAME_LABELS[g]}</option>`,
-    ).join('');
-    const initialBodyClass =
-      (GAME_SETTINGS[post.category] && GAME_SETTINGS[post.category].class) || '';
+    const success = req.query.success ? `<div class="success-msg">Изменения успешно сохранены!</div>` : '';
+    const options = GAME_OPTIONS.map(g =>
+      `<option value="${g}" ${post.category === g ? 'selected' : ''}>${GAME_LABELS[g]}</option>`).join('');
+    const initialBodyClass = (GAME_SETTINGS[post.category] && GAME_SETTINGS[post.category].class) || '';
     const gameBodyClassMap = JSON.stringify(
-      Object.fromEntries(GAME_OPTIONS.map((g) => [g, GAME_SETTINGS[g].class])),
+      Object.fromEntries(GAME_OPTIONS.map(g => [g, GAME_SETTINGS[g].class]))
     );
 
     res.send(`<!DOCTYPE html>
@@ -403,6 +428,8 @@ router.get('/edit_post/:id', requireAdmin, async (req, res, next) => {
             <input type="text" id="sub_category" name="sub_category" value="${escapeHtml(post.sub_category || 'БИЛД')}" placeholder="БИЛД">
         </div>
 
+        ${bannerPositionEditorHtml(post.banner_pos_y ?? 50)}
+
         ${templatePanelHtml()}
 
         <div id="visual-editor" contenteditable="true" class="editor-area">${post.content || ''}</div>
@@ -426,9 +453,7 @@ ${EDITOR_SCRIPTS}
 </script>
 </body>
 </html>`);
-  } catch (err) {
-    next(err);
-  }
+  } catch (err) { next(err); }
 });
 
 router.post('/edit_post/:id', requireAdmin, async (req, res, next) => {
@@ -440,17 +465,18 @@ router.post('/edit_post/:id', requireAdmin, async (req, res, next) => {
     const image = (req.body.image || '').trim() || null;
     const bannerWide = (req.body.banner_wide || '').trim() || null;
     const subCategory = (req.body.sub_category || '').trim() || 'БИЛД';
+    const bannerPosY = parseInt(req.body.banner_pos_y, 10);
+    const bannerPosYSafe = Number.isFinite(bannerPosY) ? Math.min(100, Math.max(0, bannerPosY)) : 50;
 
     if (!title || !content) return res.status(400).send('Заполните заголовок и содержание.');
 
     await pool.query(
-      'UPDATE posts SET title = ?, category = ?, content = ?, image = ?, banner_wide = ?, sub_category = ? WHERE id = ?',
-      [title, game, content, image, bannerWide, subCategory, id],
+      'UPDATE posts SET title = ?, category = ?, content = ?, image = ?, banner_wide = ?, sub_category = ?, banner_pos_y = ? WHERE id = ?',
+      [title, game, content, image, bannerWide, subCategory, bannerPosYSafe, id]
     );
-    res.redirect(`/edit_post/${id}?success=1`);
-  } catch (err) {
-    next(err);
-  }
+    logActivity(req.session.user_id, 'edited', id, title);
+    res.redirect(`/post/${id}`);
+  } catch (err) { next(err); }
 });
 
 module.exports = router;

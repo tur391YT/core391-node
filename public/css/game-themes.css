@@ -1,42 +1,24 @@
-/* game-themes.css — своё оформление для каждой игры.
+/* game-themes.css — ДОПОЛНЯЕТ уже существующую систему цветов по играм,
+   не заменяет её.
 
-   Работает поверх существующей переменной --accent-color (объявлена в
-   style2.css и уже используется в style2.css/admin.css/builder-templates.css
-   /profile.css) — переопределяем её значение в зависимости от класса на
-   <body> (genshin / zzz / wuwa / star-rail), который задаётся в
-   routes/posts.js (category.php/post.php в оригинале). Всё, что уже красится
-   через var(--accent-color), подхватывает цвет игры само.
+   Важно: цвета по играм (genshin/wuwa/zzz/star-rail) уже полностью
+   реализованы в родном style2.css через переменную --accent-color
+   (body.genshin { --accent-color: #f02424; } и т.д.) — трогать их не
+   нужно и нельзя, иначе (как уже было один раз) новые значения переопределят
+   родные и всё перекрасится неправильно.
 
-   Плюс — точечные переопределения для мест в content-styles.css, где цвет
-   зашит жёстко (не через переменную), и свой шрифт заголовков на игру. */
+   Этот файл добавляет только то, чего в оригинале не было: свой шрифт
+   заголовков на игру. Плюс — точечные переопределения для мест в
+   content-styles.css, где цвет зашит жёстко (#ff4d00 напрямую, а не через
+   переменную) — но и они используют var(--accent-color), то есть подхватят
+   ИМЕННО родной цвет игры, не свой. */
 
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Orbitron:wght@600;800&family=Exo+2:wght@600;700&family=Rajdhani:wght@600;700&display=swap');
 
-/* ===== Genshin Impact — тёплое золото, элегантный шрифт ===== */
-body.genshin {
-    --accent-color: #e8b74c;
-    --game-font: 'Cinzel', serif;
-}
-
-/* ===== Zenless Zone Zero — электрический жёлтый, резкий техно-шрифт ===== */
-body.zzz {
-    --accent-color: #f2e100;
-    --game-font: 'Orbitron', sans-serif;
-}
-
-/* ===== Wuthering Waves — золотисто-жёлтый (совпадает с уже существующим
-   .theme-wuwa в content-styles.css — расширяем этот же цвет на весь
-   раздел, а не только на страницу поста), шрифт — чистый современный ===== */
-body.wuwa {
-    --accent-color: #ffcc00;
-    --game-font: 'Exo 2', sans-serif;
-}
-
-/* ===== Honkai: Star Rail — космический фиолетовый, sci-fi шрифт ===== */
-body.star-rail {
-    --accent-color: #a78bfa;
-    --game-font: 'Rajdhani', sans-serif;
-}
+body.genshin { --game-font: 'Cinzel', serif; }
+body.zzz { --game-font: 'Orbitron', sans-serif; }
+body.wuwa { --game-font: 'Exo 2', sans-serif; }
+body.star-rail { --game-font: 'Rajdhani', sans-serif; }
 
 /* Шрифт заголовков — только там, где он реально заметен, основной текст
    статей остаётся на читаемом Inter/Segoe UI */
@@ -47,16 +29,14 @@ body[class] .wp-section-title {
 }
 
 /* ---- Точечные переопределения мест в content-styles.css, где цвет зашит
-   напрямую (#ff4d00 !important), а не через переменную. Специфичность
-   (класс body.<игра> + исходный селектор) уже выше оригинала — трюков с
-   повтором классов тут не требуется. ---- */
+   напрямую (#ff4d00 !important), а не через переменную. var(--accent-color)
+   тут — родная переменная из style2.css, свою мы не объявляем. ---- */
 
 body.genshin .wp-section-title,
 body.zzz .wp-section-title,
 body.wuwa .wp-section-title,
 body.star-rail .wp-section-title {
     border-left-color: var(--accent-color) !important;
-    color: var(--accent-color) !important;
 }
 
 body.genshin .wp-table-weapon th,
