@@ -169,3 +169,13 @@
     display: inline-block !important;
     margin: 5px 0 !important;
 }
+
+/* ==========================================================================
+   Панель кнопок шаблонов "прилипает" к верху экрана при прокрутке — не
+   нужно бегать до верха страницы и обратно на длинных постах. */
+.template-panel {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 50 !important;
+    background: #101012 !important;
+}

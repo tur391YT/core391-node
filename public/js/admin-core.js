@@ -34,7 +34,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             <td class="wp-cell-center">
                                 <img src="${PLACEHOLDER_IMG}" class="wp-avatar-img" alt="${label}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer;">
                                 <div class="wp-item-name">Название предмета</div>
-                                <div style="color: #ffcc00;">★★★★★</div>
+                                <div class="wp-stars" style="color: #ffcc00;">★★★★★</div>
+                                <div class="wp-item-stats" style="text-align: left; font-size: 12px; color: #aaa; margin-top: 6px; line-height: 1.6;">
+                                    <div>HP: 000-0000</div>
+                                    <div>Сила атаки: 00-000</div>
+                                    <div>Защита: 00-000</div>
+                                </div>
                             </td>
                             <td class="wp-cell-effect">
                                 <p>Описание эффекта, пассивного бонуса или комплекта...</p>
@@ -45,6 +50,63 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <p></p>
         `;
+    }
+
+    // Строит один слот отряда (роль + один или несколько альтернативных
+    // персонажей внутри .wp-slot-chars-row — сюда же добавляет свои
+    // элементы кнопка "+ Или (альт. персонаж)")
+    function buildSlotHtml(roleClass, roleColor, roleLabel, charName) {
+        return `
+            <div class="wp-slot" style="text-align: center; flex: 1;">
+                <div class="wp-slot-role ${roleClass}" style="color: ${roleColor}; font-weight: bold;">${roleLabel}</div>
+                <div class="wp-slot-chars-row" style="display: flex; gap: 6px; justify-content: center; align-items: flex-end; flex-wrap: wrap;">
+                    <div class="wp-slot-char">
+                        <img src="${PLACEHOLDER_IMG}" alt="Персонаж" style="width: 60px; height: 60px; border-radius: 8px; cursor: pointer; display: block; margin: 0 auto 4px;">
+                        <div class="wp-slot-name">${charName}</div>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    // Блок "Отряд" — для Genshin с колонкой описания синергии (там она
+    // изначально и была нужна), для остальных игр — просто ряд слотов
+    // без таблицы и пустого места справа.
+    function buildTeamSlotsHtml() {
+        const gameSelect = document.getElementById('game-category');
+        const gameValue = gameSelect ? gameSelect.value : '';
+
+        const slotsRow = `<div class="wp-team-slots" style="display: flex; gap: 10px;">`
+            + buildSlotHtml('main-dd', '#ff4444', 'МЕЙН ДД', 'Персонаж 1')
+            + buildSlotHtml('sub-dd', '#ffbb00', 'САП ДД', 'Персонаж 2')
+            + buildSlotHtml('support', '#33b5e5', 'САППОРТ', 'Персонаж 3')
+            + buildSlotHtml('heal', '#00C851', 'ХИЛЕР', 'Персонаж 4')
+            + `</div>`;
+
+        if (gameValue === 'genshin') {
+            return `
+                <div class="wp-table-wrapper">
+                    <table class="wp-table-team">
+                        <thead>
+                            <tr>
+                                <th style="width: 55%;">Компоновка группы</th>
+                                <th style="width: 45%;">Описание синергии и тактика</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>${slotsRow}</td>
+                                <td class="wp-cell-effect">
+                                    <p>Опишите здесь, почему именно такой состав хорошо работает — синергия между персонажами, порядок применения способностей...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p></p>
+            `;
+        }
+
+        return `${slotsRow}<p></p>`;
     }
 
     // Авто-синхронизация с скрытым полем отправки формы
@@ -58,52 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // НАБОР ТОЧЕЧНЫХ ШАБЛОНОВ CORE 391
     // ==========================================
     const CORE_TEMPLATES = {
-        // 1. Блок отряда на 4 слота
-        teamSlots: `
-            <div class="wp-table-wrapper">
-                <table class="wp-table-team">
-                    <thead>
-                        <tr>
-                            <th style="width: 55%;">Компоновка группы</th>
-                            <th style="width: 45%;">Описание синергии и тактика</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <div class="wp-team-slots" style="display: flex; gap: 10px;">
-                                    <div class="wp-slot" style="text-align: center; flex: 1;">
-                                        <div class="wp-slot-role main-dd" style="color: #ff4444; font-weight: bold;">МЕЙН ДД</div>
-                                        <img src="${PLACEHOLDER_IMG}" alt="Персонаж" style="width: 60px; height: 60px; border-radius: 8px; cursor: pointer; margin: 5px 0;">
-                                        <div class="wp-slot-name">Персонаж 1</div>
-                                    </div>
-                                    <div class="wp-slot" style="text-align: center; flex: 1;">
-                                        <div class="wp-slot-role sub-dd" style="color: #ffbb00; font-weight: bold;">САП ДД</div>
-                                        <img src="${PLACEHOLDER_IMG}" alt="Персонаж" style="width: 60px; height: 60px; border-radius: 8px; cursor: pointer; margin: 5px 0;">
-                                        <div class="wp-slot-name">Персонаж 2</div>
-                                    </div>
-                                    <div class="wp-slot" style="text-align: center; flex: 1;">
-                                        <div class="wp-slot-role support" style="color: #33b5e5; font-weight: bold;">САППОРТ</div>
-                                        <img src="${PLACEHOLDER_IMG}" alt="Персонаж" style="width: 60px; height: 60px; border-radius: 8px; cursor: pointer; margin: 5px 0;">
-                                        <div class="wp-slot-name">Персонаж 3</div>
-                                    </div>
-                                    <div class="wp-slot" style="text-align: center; flex: 1;">
-                                        <div class="wp-slot-role heal" style="color: #00C851; font-weight: bold;">ХИЛЕР</div>
-                                        <img src="${PLACEHOLDER_IMG}" alt="Персонаж" style="width: 60px; height: 60px; border-radius: 8px; cursor: pointer; margin: 5px 0;">
-                                        <div class="wp-slot-name">Персонаж 4</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="wp-cell-effect">
-                                <p>Опишите здесь, почему именно такой состав хорошо работает — синергия между персонажами, порядок применения способностей...</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <p></p>
-        `,
-
         // 2. Блок преимуществ и недостатков
         prosCons: `
             <div class="wp-pros-cons-container">
@@ -147,6 +163,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     syncData();
                 }
             }
+        });
+
+        // Клик по заголовку/короткой подписи сразу выделяет весь её текст —
+        // не нужно вручную выделять и стирать по букве, следующее нажатие
+        // клавиши сразу заменит содержимое целиком.
+        const QUICK_SELECT_SELECTOR = [
+            '.wp-section-title', '.wp-item-name', '.wp-slot-name',
+            '.wp-item-sub', '.wp-set-desc', '.wp-block-header-text',
+            '.wp-echo-stats', '.wp-stars'
+        ].join(', ');
+
+        visualEditor.addEventListener('click', (e) => {
+            const target = e.target.closest(QUICK_SELECT_SELECTOR);
+            if (!target || e.target.tagName === 'IMG') return;
+
+            const range = document.createRange();
+            range.selectNodeContents(target);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
         });
 
         // Вставка картинок через Ctrl+V из буфера обмена. Если курсор сейчас
@@ -226,7 +262,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // ФУНКЦИИ КНОПОК
     // ==========================================
     window.insertTemplate = function(type) {
-        const html = type === 'itemCard' ? buildItemCardHtml() : CORE_TEMPLATES[type];
+        let html;
+        if (type === 'itemCard') html = buildItemCardHtml();
+        else if (type === 'teamSlots') html = buildTeamSlotsHtml();
+        else html = CORE_TEMPLATES[type];
         if (!html) return;
 
         if (visualEditor) {
@@ -301,6 +340,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (lastSlot) {
             newSlot = lastSlot.cloneNode(true);
+            // Если у клонируемого слота были альтернативные персонажи
+            // ("или") — новый слот должен начинаться только с одного
+            const charsRow = newSlot.querySelector('.wp-slot-chars-row');
+            if (charsRow) {
+                const chars = charsRow.querySelectorAll('.wp-slot-char');
+                charsRow.querySelectorAll('.wp-slot-alt-sep').forEach(el => el.remove());
+                chars.forEach((el, i) => { if (i > 0) el.remove(); });
+            }
             const nameEl = newSlot.querySelector('.wp-slot-name');
             if (nameEl) nameEl.textContent = 'Персонаж';
         } else {
@@ -309,8 +356,12 @@ document.addEventListener('DOMContentLoaded', () => {
             newSlot.style.cssText = 'text-align: center; flex: 1;';
             newSlot.innerHTML = `
                 <div class="wp-slot-role" style="color: #aaa; font-weight: bold;">УЧАСТНИК</div>
-                <img src="${PLACEHOLDER_IMG}" alt="Персонаж" style="width: 60px; height: 60px; border-radius: 8px; cursor: pointer; margin: 5px 0;">
-                <div class="wp-slot-name">Персонаж</div>
+                <div class="wp-slot-chars-row" style="display: flex; gap: 6px; justify-content: center; align-items: flex-end; flex-wrap: wrap;">
+                    <div class="wp-slot-char">
+                        <img src="${PLACEHOLDER_IMG}" alt="Персонаж" style="width: 60px; height: 60px; border-radius: 8px; cursor: pointer; display: block; margin: 0 auto 4px;">
+                        <div class="wp-slot-name">Персонаж</div>
+                    </div>
+                </div>
             `;
         }
 
@@ -352,30 +403,33 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const existingImg = slot.querySelector('img');
+        const charsRow = slot.querySelector('.wp-slot-chars-row');
+        if (!charsRow) {
+            alert('Этот слот в старом формате — пересоздайте его через кнопку "+ Отряд", чтобы можно было добавлять альтернативы');
+            return;
+        }
+
+        const existingChar = charsRow.querySelector('.wp-slot-char');
 
         const divider = document.createElement('div');
-        divider.className = 'wp-slot-alt-divider';
+        divider.className = 'wp-slot-alt-sep';
         divider.textContent = 'или';
-        divider.style.cssText = 'color:#888; font-size:11px; text-transform:uppercase; margin:6px 0 2px;';
+        divider.style.cssText = 'color:#888; font-size:10px; text-transform:uppercase; align-self:center; padding-bottom:18px;';
 
-        const newImg = existingImg
-            ? existingImg.cloneNode(true)
+        const newChar = existingChar
+            ? existingChar.cloneNode(true)
             : (() => {
-                const img = document.createElement('img');
-                img.src = PLACEHOLDER_IMG;
-                img.alt = 'Персонаж';
-                img.style.cssText = 'width: 60px; height: 60px; border-radius: 8px; cursor: pointer; margin: 5px 0;';
-                return img;
+                const div = document.createElement('div');
+                div.className = 'wp-slot-char';
+                div.innerHTML = `<img src="${PLACEHOLDER_IMG}" alt="Персонаж" style="width: 60px; height: 60px; border-radius: 8px; cursor: pointer; display: block; margin: 0 auto 4px;"><div class="wp-slot-name">Персонаж</div>`;
+                return div;
             })();
 
-        const newName = document.createElement('div');
-        newName.className = 'wp-slot-name';
-        newName.textContent = 'Персонаж';
+        const nameEl = newChar.querySelector('.wp-slot-name');
+        if (nameEl) nameEl.textContent = 'Персонаж';
 
-        slot.appendChild(divider);
-        slot.appendChild(newImg);
-        slot.appendChild(newName);
+        charsRow.appendChild(divider);
+        charsRow.appendChild(newChar);
         syncData();
     };
 });
